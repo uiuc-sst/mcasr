@@ -1,0 +1,4 @@
+Audio+text corpora from Lorelei for Uyghur, Uzbek, and Russian (LDC2016E94) are in
+/ws/ifp-serv-03_1/workspace/fletcher/fletcher1/speech_data1/{Uyghur,Uzbek,Russian}.
+
+We'll run this software on those corpora during July.
