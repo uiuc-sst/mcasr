@@ -1,5 +1,5 @@
 ## Mismatched Crowdsourcing Automatic Speech Recognition
-### Train an ASR directly from mismatched transcripts, based on kaldi/egs/librispeech.
+### Train an ASR directly from mismatched transcripts, based on [kaldi/egs/librispeech](https://github.com/kaldi-asr/kaldi/tree/master/egs/librispeech).
 
 <!-- https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet -->
 
