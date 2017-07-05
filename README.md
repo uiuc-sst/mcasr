@@ -20,12 +20,11 @@ We need these software components:
 
 Make a pronunciation lexicon of English nonsense words, which Kaldi calls `lexiconp.txt`.
 Its vocabulary is the space-delimited words in Turker transcripts.
-For each word, use <http://www.isle.illinois.edu/sst/data/g2ps/English/English_ref_orthography_dict.html>
-to find all of its pronunciations, and list them separately in `lexiconp.txt`.
-The units of `English_ref_orthography_dict.txt` are designed so that you should prefer any digraph or trigraph to the single-grapheme.
-To implement that, assign a probability to each pronunciation proportional to exp(-(number of entries from `English_ref_orthography.html` that were concatenated to form this candidate pronunciation)).
+For each word, find its pronunciations with <http://www.isle.illinois.edu/sst/data/g2ps/English/English_ref_orthography_dict.html> and list them in `lexiconp.txt`.
+This dictionary's units are designed so that you should prefer digraphs and trigraphs to single graphemes.
+To implement that, to each candidate pronunciation assign a probability proportional to exp(-(number of concatenated dictionary entries that form this pronunciation)).
 
-Scripts for this are in the subfolder [1-nonsenseDict](./1-nonsenseDict).
+Scripts are in the subfolder [1-nonsenseDict](./1-nonsenseDict).
 The script [1-nonsenseDict/split-words.rb](1-nonsenseDict/split-words.rb) will also preprocess turker transcripts (like <https://github.com/uiuc-sst/PTgen/blob/master/steps/preprocess_turker_transcripts.pl>).
 
 ### 2. English ASR and forced alignment
