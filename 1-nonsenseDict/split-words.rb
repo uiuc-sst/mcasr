@@ -20,8 +20,15 @@ ARGF.readlines.map(&:chomp).each {|word|
     # Accumulate words until they're too long.
     wordsIn = sNext
   else
+
     # Send the words to tex.
+    #
+    # Instead of calling tex, it would be simpler to call
+    # rubygems.org/gems/text-hyphen/versions/1.4.1 or
+    # www.nedbatchelder.com/code/modules/hyphenate.py,
+    # but those might not import many non-English hyphenation rules.
     wordsOut = `export max_print_line=#{Len}; echo "\\showhyphens{#{wordsIn}}" | tex | tail -n +4 | head -n -10`
+
     # Filter out warnings reported by tex.
     wordsOut.gsub! /Loose \\hbox \(badness \d+\) detected at line 0/, ""
     wordsOut.gsub! /Underfull \\hbox \(badness \d+\) detected at line 0/, ""
