@@ -18,7 +18,7 @@ preferably with a consistent sampling rate (22050 Hz).
 
 - `for f in *.flac; do sox "$f" "$( basename ${f%.flac}.wav )"; done;`
     
-### Split each .wav into 1.25 second clips, in .mp3 and .ogg format.
+### Split each .wav into clips of about 1.25 seconds, in .mp3 and .ogg format.
 
 - [`./split.rb`](./split.rb)
 
@@ -29,7 +29,7 @@ It runs at about 3 minutes per hour of input audio.
 - `cd /workspace/speech_web/mc/`
 - `mkdir myTest; cd myTest`
 - Into here, copy `turkAudio.tar` that was made by `split.rb`.
-- `tar xf turkAudio.tar`
+- `tar xf turkAudio.tar; rm turkAudio.tar`
 
 ### Create a "Batch file."
 [`./make-csv.rb myTest > foo.csv`](./make-csv.rb)
