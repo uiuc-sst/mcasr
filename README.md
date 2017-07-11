@@ -15,7 +15,11 @@ This has two sources of variability, which we solve separately:
 use them to train an L2 recognizer, and then align them to the audio.
  
 We need these software components:
- 
+
+### 0. Submit audio to Mechanical Turk.
+
+[Instructions and scripts.](./0-mturk/)
+
 ### 1. English nonsense dictionary
 
 Make a pronunciation lexicon of English nonsense words, which Kaldi calls `lexiconp.txt`.
