@@ -20,7 +20,7 @@ We need these software components:
 
 Make a pronunciation lexicon of English nonsense words, which Kaldi calls `lexiconp.txt`.
 Its vocabulary is the space-delimited words in Turker transcripts.
-For each word, find its pronunciations with <http://www.isle.illinois.edu/sst/data/g2ps/English/English_ref_orthography_dict.html> and list them in `lexiconp.txt`.
+For each word, find its pronunciations with www.isle.illinois.edu/sst/data/g2ps/English/English_ref_orthography_dict.html and list them in `lexiconp.txt`.
 This dictionary's units are designed so that you should prefer digraphs and trigraphs to single graphemes.
 To implement that, to each candidate pronunciation assign a probability proportional to exp(-(number of concatenated dictionary entries that form this pronunciation)).
 
@@ -29,7 +29,10 @@ The script [1-nonsenseDict/split-words.rb](1-nonsenseDict/split-words.rb) will a
 
 ### 2. English ASR and forced alignment
 
-An English-language GMM-HMM ASR, trained using the `lexiconp.txt` from (1).
+An English-language GMM-HMM ASR, trained using the `lexiconp.txt` from (1),
+and the G2P's www.isle.illinois.edu/sst/data/g2ps/English/ISLEdict.html (for context-sensitive English mappings) and
+www.isle.illinois.edu/sst/data/g2ps/all_orthography_dicts.txt (for all other languages).
+ISLEdict.txt is much larger, so the combined G2P will prefer any available English pronunciation.
 Treat every Turker transcription as an independent training token.
 So if we have 3 transcriptions per utterance, then the amount of training data is 3 times the amount of audio.
 Forced alignment then chooses the most likely pronunciation of each Turker nonsense word, maximizing p(audio|pronunciation). 
@@ -39,7 +42,7 @@ Forced alignment then chooses the most likely pronunciation of each Turker nonse
 Collect all available monolingual texts in L2.  LORELEI gives us 120k
 words of text in each foreign language, quite a lot.  Using
 *(i)* this list of words,
-*(ii)* the <http://www.isle.illinois.edu/sst/data/g2ps/> L2 reference orthography,
+*(ii)* the L2 reference orthography www.isle.illinois.edu/sst/data/g2ps/,
 and *(iii)* some kind of mapping from L2 phonemes to English phonemes,
 generate another `lexiconp.txt`,
 whose lines each contain an L2 word, a list of English phonemes, and this pronunciation's probability.
