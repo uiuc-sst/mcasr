@@ -11,12 +11,12 @@ To adjust how many turkers transcribe each HIT:
 
 Bigger numbers reduce noise, but obviously cost proportionally more.
 
-### Get a collection of recordings of speech, in .wav format, mono,
-preferably with a consistent sampling rate (22050 Hz).
+### Get a collection of recordings of speech.
+In .wav format, mono, preferably with a uniform sampling rate (22050 Hz).
 
 - If they're in .flac format, first convert them to .wav, to avoid a bug in sox:
 
-- `for f in *.flac; do sox "$f" "$( basename ${f%.flac}.wav )"; done;`
+`for f in *.flac; do sox "$f" "$( basename ${f%.flac}.wav )"; done;`
     
 ### Split each .wav into 1.25 second clips, in .mp3 and .ogg format.
 
@@ -41,7 +41,7 @@ That yields intermediate results more quickly, because each quarter of
 the clips completes before new clips start.  It also lets you fund
 the account a little at a time.
 
-- If you like, as transcriptions trickle in, collect them and process the results so far.
+If you like, as transcriptions trickle in, collect them and process the results so far:
 
 - Click on Mechanical Turk's *Manage results*, *Download csv*.
 - `mv Batch*.csv PTgen/test/myTest/batchfiles-raw`
