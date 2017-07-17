@@ -41,7 +41,15 @@ That yields intermediate results more quickly, because each quarter of
 the clips completes before new clips start.  It also lets you fund
 the account a little at a time.
 
-If you like, as transcriptions trickle in, collect them and process the results so far:
+#### As turkers work, approve or reject their HITs.
+
+- Login, click on Manage, at left look at Batches in progress, at right click on one batch's Results.
+- If you haven't done so already, at left click on Customize View, and show only the fields that matter: worker ID, last 7 days approval rate, and text1...text8.  Then click on Filter Results, Status Filter, only show Submitted ones.
+- At left, click on Worker ID, to sort by worker.  This makes it easier to notice transcriptions that are wrong or even cheating.  (Cheating workers are usually very productive, so a dozen lines of that in a row jumps out at the eye.)
+- Make your web browser very wide.
+- For each pageful, search for "text" to spot incomplete HITs, where the worker didn't change "text goes here."  Once those and the cheaters are rejected, scan the page, click just once on the top left checkbox to select all the answers, and click on Approve.
+
+#### If you like, as transcriptions trickle in, collect them and process the results so far:
 
 - Click on Mechanical Turk's *Manage results*, *Download csv*.
 - `mv Batch*.csv PTgen/test/myTest/batchfiles-raw`
