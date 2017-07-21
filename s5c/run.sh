@@ -8,12 +8,6 @@
 # Modified by Leda Sari, 7/19/2017.
 ####################################################################
 
-###################################################################
-# Step 1: Data, paths, and symlinks
-# Innovation: I'm creating separate files called
-# DATA_ROOT.txt, KALDI_ROOT.txt
-# that specify where to find these things.
-
 if [ ! -f DATA_ROOT.txt ]; then
     echo "Create the file DATA_ROOT.txt specifying location"
     echo "of the speech and mc data directories"
@@ -29,16 +23,9 @@ fi
 . ./cmd.sh
 . ./path.sh
 
-# If "steps" and "utils" are not already linked to directories, then
-#   create symlinks to the WSJ steps and utils directories
-if [ ! -d steps ]; then
-    ln -s ${KALDI_ROOT}/egs/wsj/s5/steps .
-fi
-if [ ! -d utils ]; then
-    ln -s ${KALDI_ROOT}/egs/wsj/s5/utils .
-fi
+# Directories ./steps and ./utils are copies instead of symlinks,
+# because Leda needed changes in them.
 
-# you might not want to do this for interactive shells.
 set -e
 
 # #################################################################
@@ -78,43 +65,6 @@ utils/prepare_lang.sh data/$lang/local/dict \
 echo "prepare_lang: Done"
 fi
 
-
-# === LM related scripts ===
-# We can skip these for now
-LM_CORPUS_ROOT=data/$lang/texts
-# mkdir -p $LM_CORPUS_ROOT/corpus
-
-# if [ $stage -lt 2 ] ; then
-#     export LC_ALL=en_US.UTF-8
-#     # Random transcriptions
-#     ./local/generate_text.py -N 5 $MCTranscriptdir $LM_CORPUS_ROOT/text
-    
-#     # awk '{$1=""; print}' $LM_CORPUS_ROOT/text $LM_CORPUS_ROOT/corpus/text.txt
-#     while read -r line ; do 
-# 	num_unk=$(echo $line | grep -w -o UNK | wc -l); 
-# 	if [ $num_unk -lt 12 ]; then echo $line ; fi;   
-#     done < $LM_CORPUS_ROOT/text > $LM_CORPUS_ROOT/corpus/text.txt
-
-#     echo "Generate text. Done"
-# fi  # end of stage 2
-
-# export LC_ALL=C
-
-# if [ $stage -lt 3 ]; then
-#     local/lm/train_lm.sh --normjobs 1 --model_order 2 $LM_CORPUS_ROOT \
-# 	data/$lang/local/lm/norm/tmp data/$lang/local/lm/norm/norm_texts data/$lang/local/lm
-    
-#     local/format_lms.sh --src-dir data/$lang/lang data/$lang/local/lm
-#     echo "LM training and formattind: Done"
-
-#     # Create ConstArpaLm format language model for full unigram, bigram LMs
-#     utils/build_const_arpa_lm.sh data/$lang/local/lm/lm_unigram.arpa.gz \
-# 	data/$lang/lang data/$lang/lang_test_unigram
-#     utils/build_const_arpa_lm.sh data/$lang/local/lm/lm_bigram.arpa.gz \
-# 	data/$lang/lang data/$lang/lang_test_bigram
-
-# fi  # end of stage 3
-
 export LC_ALL=C
 
 # ++++++++++++ MFCC +++
@@ -126,11 +76,7 @@ for part in $lang; do
   steps/compute_cmvn_stats.sh data/$part exp/$part/make_mfcc $mfccdir/$part
   utils/fix_data_dir.sh data/$part
 done
-
 fi
-# exit 0 ; 
-# # +++++++++++
-
 
 if [ $stage -lt 5 ]; then
 # #################################################################
@@ -141,7 +87,6 @@ steps/train_mono.sh --boost-silence 1.0 --nj 8 --cmd "$train_cmd" \
 steps/align_si.sh --boost-silence 1.0 --nj 10 --cmd "$train_cmd" \
   data/$lang data/$lang/lang exp/$lang/mono exp/$lang/mono_ali
 
-
 # ####################################################################
 # # train a first delta + delta-delta triphone system on a subset of 5000 utterances
 steps/train_deltas.sh --boost-silence 1.0 --cmd "$train_cmd" \
@@ -150,10 +95,8 @@ steps/train_deltas.sh --boost-silence 1.0 --cmd "$train_cmd" \
 steps/align_si.sh --nj 10 --cmd "$train_cmd" \
   data/$lang data/$lang/lang exp/$lang/tri1 exp/$lang/tri1_ali
 
-
 # ##########
 fi 
-
 
 if [ $stage -lt 6 ]; then 
 # ##########################################################################
@@ -181,19 +124,16 @@ steps/train_lda_mllt.sh --cmd "$train_cmd" \
 #   done
 # )&
 
-
 # steps/align_si.sh  --nj 10 --cmd "$train_cmd" --use-graphs true \
 #   data/$lang data/$lang/lang exp/$lang/tri2b exp/$lang/tri2b_ali
 steps/align_si.sh  --nj 10 --cmd "$train_cmd" \
   data/$lang data/$lang/lang exp/$lang/tri2b exp/$lang/tri2b_ali
-
 
 # ##################################################################
 # # Train tri3b, which is LDA+MLLT+SAT on 10k utts
 echo " === Start training LDA+MLLT+SAT system ==="
 steps/train_sat.sh --cmd "$train_cmd" 2500 15000 \
   data/$lang data/$lang/lang exp/$lang/tri2b_ali exp/$lang/tri3b
-
 
 # # align the entire train_clean_100 subset using the tri3b model
 steps/align_fmllr.sh --nj 20 --cmd "$train_cmd" \
@@ -211,23 +151,19 @@ steps/train_sat.sh  --cmd "$train_cmd" 4200 40000 \
 steps/align_fmllr.sh --nj 30 --cmd "$train_cmd" \
   data/$lang data/$lang/lang exp/$lang/tri4b exp/$lang/tri4b_ali
 
-
 # ##################
 fi 
 
-
 # #########################################################################
 # # ++++++ NNET ++++++
-# # # if you want at this point you can train and test NN model(s)
+# # # optionally, train and test NN model(s)
 
 # layers=3 #2
 # if [ $stage -lt 7 ]; then 
 # echo " === Start training nnet === "
 #     local/ldc_run_5a.sh --use_gpu false --num_layers $layers \
 # 	data/$lang data/$lang/lang exp/$lang/tri4b_ali exp/$lang/tri5a_${layers}_nnet
-
 # fi
-
 # if [ $stage -lt 8 ]; then 
 #     [ -f exp/$lang/tri5a_${layers}_nnet/final.mdl ] || { echo 'No nnet file' ; exit 1 ; } ;
 #     # nj 30 due to tri4b_ali
