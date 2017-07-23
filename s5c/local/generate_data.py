@@ -1,4 +1,4 @@
-#! /usr/bin/python3
+#!/usr/bin/python3
 
 from collections import defaultdict
 from glob import glob
@@ -6,27 +6,22 @@ from os import path
 import re
 import random
 
-
-
-
 def read_single_file(fname, utt_key=None, delimit='#', unk_word='', FS=44100.0):
     unk_tag = '<UNK>'
     if utt_key == None:
         bname = path.basename(fname)
         utt_key, ext = path.splitext(bname)
-    # print('======', fname)
     textL = [] # list of lists
-    # Each line is a separate list of words
-    # whole doc is a list of lists
+    # Each line is a separate list of words.
+    # Whole doc is a list of lists.
     with open(fname, 'r') as f:
         for line in f:
             line = line.strip()
             if line == '':
                 continue
             splitted = line.split(' ', 2)
-            # print(splitted)
             if len(splitted ) < 3:
-                print('No transcription?/Missing time info?', line, 'Skipping')
+                print('File ', fname, ', line "', line, '" too short.  Missing start/end times or transcription?')
                 continue
 
             tb, te = splitted[:2]
@@ -47,8 +42,6 @@ def read_single_file(fname, utt_key=None, delimit='#', unk_word='', FS=44100.0):
                 continue
     return textL 
 
-
-
 if __name__ == '__main__':
     import argparse 
     parser = argparse.ArgumentParser()
@@ -64,16 +57,13 @@ if __name__ == '__main__':
     parser.add_argument('textout', type=str, 
                         help='Mismatched transcriptions per utterance '
                         'a.k.a Kaldi data/text, maps utterance to text')
-    
     parser.add_argument('--unknown_word', type=str, default='<UNK>',
                         help='String to use for unknown/untranscribed segments '
                         '[noise] -> <UNK>')
-    
     parser.add_argument('--sampling_freq', type=float, default=44100.0,
                         help='Sampling frequency of the audio')
     parser.add_argument('--utt_prefix', type=str, default='', 
                         help='Prefix for utterance IDs, e.g. lang code')
-
     args = parser.parse_args()
         
     dirname = args.textdir
@@ -88,15 +78,13 @@ if __name__ == '__main__':
 
     wordSet = set()
     for filename in glob(dirname + '/*.txt'):
-        textL = read_single_file(filename, unk_word=unknown_word, 
-                                 FS=args.sampling_freq)
+        textL = read_single_file(filename, unk_word=unknown_word, FS=args.sampling_freq)
         bname = path.basename(filename)
         file_key, ext = path.splitext(bname)
         file_key = utt_prefix+file_key
         for tb, te, words in textL:
             # sec to msec, keep time info in the utterance name
-            utt_base_key = '{}_{:06d}_{:06d}'.format(file_key, 
-                                                       round(tb*1000), round(te*1000))
+            utt_base_key = '{}_{:06d}_{:06d}'.format(file_key, round(tb*1000), round(te*1000))
             # n = 0
             for n, w in enumerate(words):
                 utt_key = utt_base_key  + '_{:03d}'.format(n+1)
@@ -105,10 +93,8 @@ if __name__ == '__main__':
                     wordSet.update([x for x in w.split(' ') if x.find(unknown_word)==-1])
                 segf.write('{} {} {:.6f} {:.6f}\n'.format(utt_key, file_key, tb, te))
 
-
     segf.close()
     textf.close()
-
 
     # Write words 
     with open(args.vocab, 'w') as f:

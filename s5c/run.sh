@@ -14,9 +14,10 @@ if [ ! -f DATA_ROOT.txt ]; then
 fi
 data=`cat DATA_ROOT.txt`
 if [ ! -d $data ]; then
-    echo "The location ${data}, from DATA_ROOT.txt, is not a directory."
-    exit 1
+    echo "The location ${data}, from DATA_ROOT.txt, is not a directory or is unreadable."
+    #;;;; exit 1
 fi
+data="bogus"
 
 . ./cmd.sh
 . ./path.sh
@@ -32,6 +33,7 @@ set -e
 lang=Uzbek
 
 MCTranscriptdir=/ws/ifp-53_1/hasegawa/lsari2/data/mcasr/fromCamille/leda-uzbek/
+MCTranscriptdir=./uzb-scrips
 pron_var=5
 lang_subdir=Uzbek/LDC2016E66/UZB_20160711
 lang_prefix=UZB
