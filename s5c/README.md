@@ -16,16 +16,6 @@ echo /ws/ifp-53_1/hasegawa/lsari2/data/speech_data1 > DATA_ROOT.txt
 echo /ws/ifp-53_1/hasegawa/tools/kaldi/kaldi > KALDI_ROOT.txt
 ```
 
-### Customize.
-
-- For unusual setups for Festival, SRILM, Sequitur G2P, or Python, edit `path.sh`.
-
-- If the data has a different directory structure, edit `DATA_ROOT.txt` and `lang_subdir` to reflect that.
-
-- If the data's audio sample rate isn't 44100 Hz,  
-set it in `conf/mfcc.conf`'s `--sample-frequency`  
-and also in `local/ldc_data_prep.sh`'s `fs`.
-
 ### Set some variables in `run.sh`.
 
 `lang`: Language being transcribed.  
@@ -46,9 +36,17 @@ lang_prefix=UZB
 stage=0 # start
 ```
 
-### (Optional) Prepare to run a NN too.
+### Customize.
 
-In `run.sh`, uncomment stages 7 and 8, and set the NN's number of layers (default is 3).
+- For unusual setups for Festival, SRILM, Sequitur G2P, or Python, edit `path.sh`.
+
+- If the data has a different directory structure, edit `DATA_ROOT.txt` and `lang_subdir` to reflect that.
+
+- If the data's audio sample rate isn't 44100 Hz,  
+set it in `conf/mfcc.conf`'s `--sample-frequency`  
+and also in `local/ldc_data_prep.sh`'s `fs`.
+
+- To also run a NN, in `run.sh` uncomment stages 7 and 8, and set the NN's number of layers (default is 3).
 
 ### Run it!
 
