@@ -9,15 +9,13 @@
 ####################################################################
 
 if [ ! -f DATA_ROOT.txt ]; then
-    echo "Create the file DATA_ROOT.txt specifying location"
-    echo "of the speech and mc data directories"
-    exit
+    echo "Missing file DATA_ROOT.txt, which specifies the MC data directory."
+    exit 1
 fi
 data=`cat DATA_ROOT.txt`
 if [ ! -d $data ]; then
-    echo "DATA_ROOT.txt said data are stored in ${data}"
-    echo "but that location is not a directory"
-    exit
+    echo "The location ${data}, from DATA_ROOT.txt, is not a directory."
+    exit 1
 fi
 
 . ./cmd.sh
