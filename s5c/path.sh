@@ -6,7 +6,7 @@ if [ ! -e KALDI_ROOT.txt ]; then
 fi
 export KALDI_ROOT=`cat KALDI_ROOT.txt`
 if [ ! -d $KALDI_ROOT ]; then
-    echo "The location ${KALDI_ROOT}, from KALDI_ROOT.txt, is not a directory."
+    echo "The location ${KALDI_ROOT}, from KALDI_ROOT.txt, is not a directory or is unreadable."
     exit 1
 fi
 
