@@ -18,31 +18,23 @@ echo /ws/ifp-53_1/hasegawa/tools/kaldi/kaldi > KALDI_ROOT.txt
 
 ### Customize.
 
-- For unusual setups for Festival, SRILM, Sequitur G2P, or Python, change `path.sh`.
+- For unusual setups for Festival, SRILM, Sequitur G2P, or Python, edit `path.sh`.
 
-- If the data has a different directory structure, change `DATA_ROOT.txt` and `lang_subdir` to reflect that.
+- If the data has a different directory structure, edit `DATA_ROOT.txt` and `lang_subdir` to reflect that.
 
-- If the data's audio sample rate isn't 44100 Hz,
-set it in `conf/mfcc.conf`'s `--sample-frequency`
+- If the data's audio sample rate isn't 44100 Hz,  
+set it in `conf/mfcc.conf`'s `--sample-frequency`  
 and also in `local/ldc_data_prep.sh`'s `fs`.
 
 ### Set some variables in `run.sh`.
-```
-# Name of the language
-lang=
-# Mismatched transcript dir.  Each file corresponds to one long clip.
-  Each line has begin and end times, and #-delimited transcriptions.
-MCTranscriptdir=
-# Number of pronunciation variants for lexicon generation
-pron_var=
-# Where the language data is under DATA_ROOT.txt
-lang_subdir=
-# Prefix of the language in data directory
-# to e.g. convert 001_001.txt to UZB_001_001.txt (optional)
-lang_prefix=
-# One less than the stage to resume from, to skip early stages
-stage=
-```
+
+`lang`: Language being transcribed.  
+`MCTranscriptdir`: Location of transcription files. Each file corresponds to one long clip. Each line has begin and end times, and `#`-delimited transcriptions.  
+`pron_var`: Number of pronunciation variants for lexicon generation.  
+`lang_subdir`: Location of language data under `DATA_ROOT.txt`.  
+`lang_prefix`: Optional prefix of each file in MCTranscriptdir (to convert UZB_001_001.txt to 001_001.txt).  
+`stage`: One less than the stage to resume from (to skip early stages).  
+
 
 Example:
 ```
