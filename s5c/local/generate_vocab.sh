@@ -9,9 +9,8 @@ pron_variants=5
 . ./path.sh || exit 1;
 . utils/parse_options.sh || exit 1;
 
-
 if [ "$#" -lt 4 ]; then
-  echo "Usage: $0 <mc-vocab/dict> <G2P-model> <phone-set> <g2p-data-dir>"
+  echo "Usage: $0 MC_vocab/dict G2P_model phone_set G2P_data_dir"
   echo "e.g.: $0 /ws/ifp-53_1/hasegawa/lsari2/data/mcasr/fromWenda/dict_grapheme.txt data/Uyghur/local/g2p"
   exit 1
 fi
@@ -24,17 +23,17 @@ g2pmodeldir=$2
 phoneset=$3
 g2pdatadir=$4
 
+[ -f $MCdict ] || { echo "$0: missing nonsense-words file $MCdict"; exit 1; }
+[ -d $g2pmodeldir ] || { echo "$0: missing G2P model directory $g2pmodeldir"; exit 1; }
+
 mkdir -p $g2pdatadir
-
-
-[ -f $MCdict ] || { echo "Nonsense words $MCdict does not exist" ; exit 1; }
 
 echo "Model order and number of pronunciation variants for G2P application: $model_order $pron_variants"
 
 g2pmodel=$g2pmodeldir/model-$model_order
 for f in $g2pmodel $phoneset; do
-    [ -f $f ] || { echo "$0: $f does not exist" ; exit 1; }
-    # copy g2p model and the phone-set
+    [ -f $f ] || { echo "$0: missing file $f"; exit 1; }
+    # Copy G2P model and the phone set.
     cp $f ${g2pdatadir}
 done
 
@@ -52,4 +51,3 @@ fi
 ls $g2pmodel
 
 ./local/g2p.sh $g2pdatadir/vocab.plain ${g2pdatadir} $g2pdatadir/lexicon_autogen.1 $model_order $pron_variants
-

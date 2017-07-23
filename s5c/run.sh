@@ -8,16 +8,9 @@
 # Modified by Leda Sari, 7/19/2017.
 ####################################################################
 
-if [ ! -f DATA_ROOT.txt ]; then
-    echo "Missing file DATA_ROOT.txt, which specifies the MC data directory."
-    exit 1
-fi
+[ -f DATA_ROOT.txt ] || { echo "$0: missing file DATA_ROOT.txt, which specifies the MC data directory."; exit 1; }
 data=`cat DATA_ROOT.txt`
-if [ ! -d $data ]; then
-    echo "The location ${data}, from DATA_ROOT.txt, is not a directory or is unreadable."
-    #;;;; exit 1
-fi
-data="bogus"
+[ -d $data ] || { echo "$0: missing directory ${data}, from DATA_ROOT.txt."; exit 1; }
 
 . ./cmd.sh
 . ./path.sh
@@ -33,7 +26,6 @@ set -e
 lang=Uzbek
 
 MCTranscriptdir=/ws/ifp-53_1/hasegawa/lsari2/data/mcasr/fromCamille/leda-uzbek/
-MCTranscriptdir=./uzb-scrips
 pron_var=5
 lang_subdir=Uzbek/LDC2016E66/UZB_20160711
 lang_prefix=UZB
@@ -47,6 +39,7 @@ if [ $stage -lt 1 ] ; then
 local/ldc_data_prep.sh $lang_subdir $MCTranscriptdir data/$lang $lang_prefix
 echo "+++ Data prep done"
 
+[ -d inputs ] || { echo "$0: missing inputs directory 'inputs'"; exit 1; }
 g2p_model_dir=inputs/g2p_reduced_model
 phoneset=inputs/phoneset.txt # Includes OOV symbol
 g2pdatadir=data/$lang/g2p
@@ -58,7 +51,6 @@ echo "Generate vocab: Done"
 
 bash local/ldc_lang_prep.sh $g2pdatadir data/$lang/local/dict
 echo 'lang prep: Done'
-
 
 utils/prepare_lang.sh data/$lang/local/dict \
   "<UNK>" data/$lang/local/lang_tmp data/$lang/lang
