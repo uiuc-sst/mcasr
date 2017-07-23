@@ -21,7 +21,7 @@ def read_single_file(fname, utt_key=None, delimit='#', unk_word='', FS=44100.0):
                 continue
             splitted = line.split(' ', 2)
             if len(splitted ) < 3:
-                print('File ', fname, ', line "', line, '" too short.  Missing start/end times or transcription?')
+                print('In file', fname, 'skipping too-short line:', line)
                 continue
 
             tb, te = splitted[:2]
