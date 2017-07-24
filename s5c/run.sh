@@ -37,7 +37,7 @@ export LC_ALL=C
 if [ $stage -lt 1 ] ; then
 
 local/ldc_data_prep.sh $lang_subdir $MCTranscriptdir data/$lang $lang_prefix
-echo "+++ Data prep done"
+echo "Data prep: Done"
 
 [ -d inputs ] || { echo "$0: missing inputs directory 'inputs'"; exit 1; }
 g2p_model_dir=inputs/g2p_reduced_model
@@ -45,11 +45,11 @@ phoneset=inputs/phoneset.txt # Includes OOV symbol
 g2pdatadir=data/$lang/g2p
 MCdict=$g2pdatadir/vocab.words 
 
-# Apply G2P (Assuming that we have already trained a G2P model)
+# Apply the trained G2P model in $g2p_model_dir.
 local/generate_vocab.sh --model_order 2 --pron_variants $pron_var $MCdict $g2p_model_dir $phoneset $g2pdatadir 
 echo "Generate vocab: Done"
 
-bash local/ldc_lang_prep.sh $g2pdatadir data/$lang/local/dict
+local/ldc_lang_prep.sh $g2pdatadir data/$lang/local/dict
 echo 'lang prep: Done'
 
 utils/prepare_lang.sh data/$lang/local/dict \
@@ -92,7 +92,7 @@ fi
 
 if [ $stage -lt 6 ]; then 
 # ##########################################################################
-echo " === Start training LDA+MLLT system ==="
+echo "=== Train LDA+MLLT system ==="
 # # train an LDA+MLLT system.
 steps/train_lda_mllt.sh --cmd "$train_cmd" \
    --splice-opts "--left-context=3 --right-context=3" 2500 15000 \
@@ -123,7 +123,7 @@ steps/align_si.sh  --nj 10 --cmd "$train_cmd" \
 
 # ##################################################################
 # # Train tri3b, which is LDA+MLLT+SAT on 10k utts
-echo " === Start training LDA+MLLT+SAT system ==="
+echo "=== Train LDA+MLLT+SAT system ==="
 steps/train_sat.sh --cmd "$train_cmd" 2500 15000 \
   data/$lang data/$lang/lang exp/$lang/tri2b_ali exp/$lang/tri3b
 
@@ -133,7 +133,7 @@ steps/align_fmllr.sh --nj 20 --cmd "$train_cmd" \
   exp/$lang/tri3b exp/$lang/tri3b_ali
 
 # ######################################################################
-echo " === Another LDA+MLLT+SAT system ==="
+echo "=== Train another LDA+MLLT+SAT system ==="
 # # train another LDA+MLLT+SAT system on the entire 100 hour subset
 steps/train_sat.sh  --cmd "$train_cmd" 4200 40000 \
   data/$lang data/$lang/lang \
