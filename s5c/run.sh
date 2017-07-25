@@ -70,6 +70,9 @@ for part in $lang; do
 done
 fi
 
+# Because each of the following stages uses the previous stage's alignment
+# directory and some other files, these stages can't be run in parallel.
+
 if [ $stage -lt 5 ]; then
 # #################################################################
 # train a monophone system
