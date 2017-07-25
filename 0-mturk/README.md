@@ -53,4 +53,4 @@ the account a little at a time.
 
 - Click on Mechanical Turk's *Manage results*, *Download csv*.
 - `mv Batch*.csv PTgen/test/myTest/batchfiles-raw`
-- `cat PTgen/test/myTest/batchfiles-raw/Batch*.csv > PTgen/test/myTest/data/batchfiles/myLanguageCode/batchfile/Batches-downloaded.txt`
+- Make a directory of text files, one per utterance, each one with lines containing a start time offset, end time offset, and `#`-delimited transcriptions, by running something like [`restitch-clips-rus.rb`](./restitch-clips-rus.rb) that reads those batch files.
