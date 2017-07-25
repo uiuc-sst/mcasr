@@ -46,7 +46,7 @@ stage=0 # start
 set it in `conf/mfcc.conf`'s `--sample-frequency`  
 and also in `local/ldc_data_prep.sh`'s `fs`.
 
-- To also run a NN, in `run.sh` uncomment stages 7 and 8, and set the NN's number of layers (default is 3).
+- To also run a NN, in `run.sh` uncomment stages 9 and 10, and set the NN's number of layers (default is 3).
 
 ### Run it!
 

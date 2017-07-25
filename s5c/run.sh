@@ -119,7 +119,9 @@ steps/train_lda_mllt.sh --cmd "$train_cmd" \
 # ... --use-graphs true \
 steps/align_si.sh  --nj 50 --cmd "$train_cmd" \
   data/$lang data/$lang/lang exp/$lang/tri2b exp/$lang/tri2b_ali
+fi
 
+if [ $stage -lt 7 ]; then 
 # ##################################################################
 # # Train tri3b, which is LDA+MLLT+SAT on 10k utts
 echo "=== Train LDA+MLLT+SAT system ==="
@@ -130,7 +132,9 @@ steps/train_sat.sh --cmd "$train_cmd" 2500 15000 \
 steps/align_fmllr.sh --nj 50 --cmd "$train_cmd" \
   data/$lang data/$lang/lang \
   exp/$lang/tri3b exp/$lang/tri3b_ali
+fi
 
+if [ $stage -lt 8 ]; then 
 # ######################################################################
 echo "=== Train another LDA+MLLT+SAT system ==="
 # # train another LDA+MLLT+SAT system on the entire 100 hour subset
@@ -150,12 +154,12 @@ fi
 # # # optionally, train and test NN model(s)
 
 # layers=3 #2
-# if [ $stage -lt 7 ]; then 
+# if [ $stage -lt 9 ]; then 
 # echo " === Start training nnet === "
 #     local/ldc_run_5a.sh --use_gpu false --num_layers $layers \
 # 	data/$lang data/$lang/lang exp/$lang/tri4b_ali exp/$lang/tri5a_${layers}_nnet
 # fi
-# if [ $stage -lt 8 ]; then 
+# if [ $stage -lt 10 ]; then 
 #     [ -f exp/$lang/tri5a_${layers}_nnet/final.mdl ] || { echo 'No nnet file' ; exit 1 ; } ;
 #     # nj 30 due to tri4b_ali
 #     steps/nnet2/align.sh --nj 50 --transform-dir exp/$lang/tri4b_ali data/$lang data/$lang/lang exp/$lang/tri5a_${layers}_nnet exp/$lang/tri5a_${layers}_nnet_ali
