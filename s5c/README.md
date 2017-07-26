@@ -18,11 +18,12 @@ echo /ws/ifp-53_1/hasegawa/tools/kaldi/kaldi > KALDI_ROOT.txt
 
 ### Set some variables in `run.sh`.
 
-`lang`: Language being transcribed.  
+`lang`: The language being transcribed, and the name of the subdirectories
+of the data dir `./data` and the output dirs `./exp` and `./$mfccdir`.  
 `MCTranscriptdir`: Location of transcription files. Each file corresponds to one long clip. Each line has begin and end times, and `#`-delimited transcriptions.  These files are built by a script `restitch-clips-SomeLanguage.rb` in [`0-mturk`](../0-mturk).  
 `pron_var`: Number of pronunciation variants for lexicon generation.  
 `lang_subdir`: Location of language data under `DATA_ROOT.txt`.  
-`lang_prefix`: Optional prefix of each file in MCTranscriptdir (to convert UZB_001_001.txt to 001_001.txt).  
+`lang_prefix`: Optional prefix of each file in MCTranscriptdir (so 001_001.txt becomes UZB_001_001.txt: see `utt_prefix` in `local/generate_data.py`).  
 `stage`: One less than the stage to resume from (to skip early stages).  
 
 
