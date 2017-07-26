@@ -52,3 +52,7 @@ and also in `local/ldc_data_prep.sh`'s `fs`.
 ### Run it!
 
 `./run.sh`
+
+### Cleaning up.
+
+To remove generated files, or for a *completely* fresh run when setting `stage=0` in `run.sh`, remove the directories `exp/$lang` and `data/$lang`.
