@@ -5,7 +5,7 @@
 
 # Read those phone seqs.
 $phoneFile="/r/lorelei/PTgen/mcasr/phones.txt"
-$phoneSeqs = File.readlines("prondict_uzbek-from-wenda.txt").map {|l| l.chomp.split("\t")[1] .sub(" ABORT", "") .strip}
+$phoneSeqs = File.readlines("prondict_uzbek-from-wenda.txt").map {|l| l.chomp.split("\t")[1] .strip} .delete_if {|l| l =~ / ABORT$/}
 $phones = File.readlines($phoneFile) .map {|l| l.split[0]} .sort
 STDERR.puts "Phones parsed."
 
