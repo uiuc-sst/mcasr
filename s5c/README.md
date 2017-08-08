@@ -1,14 +1,7 @@
 ## Leda Sari's scripts.
 
-### Copy the scripts and the input files.
-```
-setupdir='../s5c'
-expdir='.'
-cp -r $setupdir/{conf,cmd.sh,path.sh,local,steps,utils,run.sh} $expdir
-```
-
-Also copy the G2P model:
-`cp -r $setupdir/inputs $expdir`
+### Get the G2P model.
+The directory `./inputs` needs the file `phoneset.txt` and the subdirectories `g2p_reduced` and `g2p_reduced_model`.
 
 ### Say where the data is and where Kaldi is.
 ```
@@ -37,6 +30,8 @@ Examples are in the files `settings_xxx`, for instance [`settings_uzb`](./settin
 - If the data's audio sample rate isn't 44100 Hz,  
 set it in `conf/mfcc.conf`'s `--sample-frequency`  
 and also in `local/ldc_data_prep.sh`'s `fs`.
+
+- More customizations are possible in `conf/*`.
 
 - To also run a NN, in `run.sh` uncomment stages 9 and 10, and set the NN's number of layers (default is 3).
 
