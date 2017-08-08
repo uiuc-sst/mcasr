@@ -6,30 +6,26 @@
 # Initialized by Mark Hasegawa-Johnson, 6/20/2017,
 # based on kaldi/egs/librispeech/s5/run.sh. 
 # Modified by Leda Sari, 7/19/2017.
+# Refactored by Camille Goudeseune.
 ####################################################################
 
+[ $# -eq 1 ] || { echo "Usage: $0 settings_file"; exit 1; }
+[ -f $1 ] || { echo "$0: missing settings file '$1'." && exit 1; }
 [ -f DATA_ROOT.txt ] || { echo "$0: missing file DATA_ROOT.txt, which specifies the MC data directory."; exit 1; }
 data=`cat DATA_ROOT.txt`
-[ -d $data ] || { echo "$0: missing directory ${data}, from DATA_ROOT.txt."; exit 1; }
+[ -d $data ] || { echo "$0: missing directory $data, from DATA_ROOT.txt."; exit 1; }
 
 . ./cmd.sh
 . ./path.sh
+. $1 # Read settings: $lang, $MCTranscriptdir, $lang_subdir, $lang_prefix, $pron_var, $stage.
 
 # Directories ./steps and ./utils are copies instead of symlinks,
-# because Leda needed changes in them.
+# because they have changes.
 
 set -e
 
 # #################################################################
 # # format the data as Kaldi data directories
-
-lang=Uzbek
-
-MCTranscriptdir=/ws/ifp-53_1/hasegawa/lsari2/data/mcasr/fromCamille/leda-uzbek/
-pron_var=5
-lang_subdir=Uzbek/LDC2016E66/UZB_20160711
-lang_prefix=UZB
-stage=0
 
 export LC_ALL=C
 
@@ -40,8 +36,8 @@ local/ldc_data_prep.sh $lang_subdir $MCTranscriptdir data/$lang $lang_prefix
 echo "Data prep: Done"
 
 [ -d inputs ] || { echo "$0: missing inputs directory 'inputs'"; exit 1; }
-g2p_model_dir=inputs/g2p_reduced_model
 phoneset=inputs/phoneset.txt # Includes OOV symbol
+g2p_model_dir=inputs/g2p_reduced_model
 g2pdatadir=data/$lang/g2p
 MCdict=$g2pdatadir/vocab.words 
 
@@ -56,8 +52,6 @@ utils/prepare_lang.sh data/$lang/local/dict \
   "<UNK>" data/$lang/local/lang_tmp data/$lang/lang
 echo "prepare_lang: Done"
 fi
-
-export LC_ALL=C
 
 # ++++++++++++ MFCC +++
 mfccdir=mfcc

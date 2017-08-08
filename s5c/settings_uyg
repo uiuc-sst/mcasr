@@ -1,0 +1,6 @@
+lang=Uyghur
+MCTranscriptdir=scrips-uyg/
+lang_subdir=Uyghur/LDC2016E119/IL3_DEV_20170201
+lang_prefix=IL3_DEV
+pron_var=5
+stage=0

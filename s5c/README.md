@@ -16,7 +16,7 @@ echo /ws/ifp-53_1/hasegawa/lsari2/data/speech_data1 > DATA_ROOT.txt
 echo /ws/ifp-53_1/hasegawa/tools/kaldi/kaldi > KALDI_ROOT.txt
 ```
 
-### Set some variables in `run.sh`.
+### Define variables in the settings file read by `run.sh`.
 
 `lang`: The language being transcribed, and the name of the subdirectories
 of the data dir `./data` and the output dirs `./exp` and `./$mfccdir`.  
@@ -24,18 +24,9 @@ of the data dir `./data` and the output dirs `./exp` and `./$mfccdir`.
 `pron_var`: Number of pronunciation variants for lexicon generation.  
 `lang_subdir`: Location of language data under `DATA_ROOT.txt`.  
 `lang_prefix`: Optional prefix of each file in MCTranscriptdir (so 001_001.txt becomes UZB_001_001.txt: see `utt_prefix` in `local/generate_data.py`).  
-`stage`: One less than the stage to resume from (to skip early stages).  
+`stage`: One less than the stage to resume from (to skip early stages when rerunning).  
 
-
-Example:
-```
-lang=uzbek
-MCTranscriptdir=leda_uzbek
-pron_var=5
-lang_subdir=Uzbek/LDC2016E66/UZB_20160711
-lang_prefix=UZB
-stage=0 # start
-```
+Examples are in the files `settings_xxx`, for instance [`settings_uzb`](./settings_uzb) for Uzbek.
 
 ### Customize.
 
@@ -51,8 +42,8 @@ and also in `local/ldc_data_prep.sh`'s `fs`.
 
 ### Run it!
 
-`./run.sh`
+`./run.sh settings_uzb`, or `./run.sh settings_rus`, etc.
 
-### Cleaning up.
+### Clean up.
 
-To remove generated files, or for a *completely* fresh run when setting `stage=0` in `run.sh`, remove the directories `exp/$lang` and `data/$lang`.
+To remove generated files, or for a *completely* fresh run when setting `stage=0` in the settings file, remove the directories `exp/$lang` and `data/$lang`.
