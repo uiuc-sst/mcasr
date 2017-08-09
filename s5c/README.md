@@ -28,11 +28,8 @@ Examples are in the files `settings_xxx`, for instance [`settings_uzb`](./settin
 
 - If the data has a different directory structure, edit `DATA_ROOT.txt` and `lang_subdir` to reflect that.
 
-- If the data's audio sample rate isn't 44100 Hz,  
-set it in `conf/mfcc.conf`'s `--sample-frequency`  
-and also in `local/ldc_data_prep.sh`'s `fs`.
-
-- More customizations are possible in `conf/*`.
+- More customizations are possible in `conf/*`.  (Because `conf/mfcc.conf` is made by `run.sh`, to customize
+the former you have to edit the latter.)
 
 - To also run a NN, in `run.sh` uncomment stages 9 and 10, and set the NN's number of layers (default is 3).
 
