@@ -74,7 +74,6 @@ if __name__ == '__main__':
 
     segf = open(args.segments, 'w')
     textf = open(args.textout, 'w')
-    # utt2spk = open(args.utt2spk, 'w')
 
     wordSet = set()
     for filename in glob(dirname + '/*.txt'):
@@ -83,8 +82,15 @@ if __name__ == '__main__':
         file_key, ext = path.splitext(bname)
         file_key = utt_prefix+file_key
         for tb, te, words in textL:
-            # sec to msec, keep time info in the utterance name
-            utt_base_key = '{}_{:06d}_{:06d}'.format(file_key, round(tb*1000), round(te*1000))
+            # sec to msec or to microsec, keep time info in the utterance name
+            if args.sampling_freq == 44100.0:
+                foo = '{}_{:06d}_{:06d}'
+                scale = 1000
+            else:
+                # args.sampling_freq == 1e6:  actually what's in microseconds is timing info in the transcriptions, not the audio data.
+                foo = '{}_{:09d}_{:09d}'
+                scale = 1e6
+            utt_base_key = foo.format(file_key, round(tb*scale), round(te*scale))
             # n = 0
             for n, w in enumerate(words):
                 utt_key = utt_base_key  + '_{:03d}'.format(n+1)

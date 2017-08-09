@@ -1,7 +1,8 @@
 lang=Uyghur
-MCTranscriptdir=scrips-uyg/
+MCTranscriptdir=scrips-uyg
 lang_subdir=Uyghur/LDC2016E119/IL3_DEV_20170201
 lang_prefix=IL3_DEV
 sample_rate=44100
 pron_var=5
+scrip_timing_in_samples=true
 stage=0
