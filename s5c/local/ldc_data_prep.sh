@@ -30,9 +30,9 @@ for d in $src/*/AUDIO; do
   ls $d/*.flac 
 done > $dst/all.flist
 
-fs=44100
 nbits=16
-sox_options="-t flac -r $fs -e signed-integer -b $nbits"
+sox_options="-t flac -r $sample_rate -e signed-integer -b $nbits"
+# $sample_rate comes from run.sh's settings file.
 
 wavdir=$dst/wav
 olist=$dst/wav.list
@@ -46,8 +46,8 @@ if [ ! -e $wavscp ]; then
     bname=${bname%.flac}
     sox $sox_options $line -t wav $wavdir/${bname}.wav
 
+    # Skip any file shorter than 1000 samples.
     nsamples=`soxi -s "$wavdir/${bname}.wav"`;
-    # Check if the file is too short, less than 1000 samples
     if [[ "$nsamples" -gt 1000 ]]; then 
       echo "$wavdir/${bname}.wav" >> $olist;
       echo "$bname $wavdir/${bname}.wav" >> $wavscp
@@ -57,6 +57,7 @@ fi
 
 echo "local/generate_data.py $transcriptdir $dst/segments $dst/vocab $dst/text --utt_prefix $pref;"
 local/generate_data.py $transcriptdir $dst/segments $dst/vocab $dst/text --utt_prefix $pref;
+# Or ... --utt_prefix $pref --sampling_freq $sample_rate;
 # utt2spk? 
 paste <(cut -d ' ' -f 1 $dst/text) <(cut -d '_' -f 1,2,3 $dst/text ) > $dst/utt2spk
 # Because we lack speaker information, utt2spk maps utt to utt.

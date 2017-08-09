@@ -17,6 +17,7 @@ of the data dir `./data` and the output dirs `./exp` and `./$mfccdir`.
 `pron_var`: Number of pronunciation variants for lexicon generation.  
 `lang_subdir`: Location of language data under `DATA_ROOT.txt`.  
 `lang_prefix`: Optional prefix of each file in MCTranscriptdir (so 001_001.txt becomes UZB_001_001.txt: see `utt_prefix` in `local/generate_data.py`).  
+`sample_rate`: Sample rate, in Hz, of the audio files in `lang_subdir`.  
 `stage`: One less than the stage to resume from (to skip early stages when rerunning).  
 
 Examples are in the files `settings_xxx`, for instance [`settings_uzb`](./settings_uzb) for Uzbek.

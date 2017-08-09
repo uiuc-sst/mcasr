@@ -17,7 +17,7 @@ data=`cat DATA_ROOT.txt`
 
 . ./cmd.sh
 . ./path.sh
-. $1 # Read settings: $lang, $MCTranscriptdir, $lang_subdir, $lang_prefix, $pron_var, $stage.
+. $1 # Read settings: $lang, $MCTranscriptdir, $lang_subdir, $lang_prefix, $sample_rate, $pron_var, $stage.
 
 # Directories ./steps and ./utils are copies instead of symlinks,
 # because they have changes.
@@ -56,6 +56,7 @@ fi
 # ++++++++++++ MFCC +++
 mfccdir=mfcc
 if [ $stage -lt 4 ]; then 
+echo -e "--use-energy=false\n--sample-frequency=$sample_rate" > conf/mfcc.conf
 # # for part in LDC2016E66 LDC2016E119 LDC2016E111 ; do
 for part in $lang; do
   steps/make_mfcc.sh --cmd "$train_cmd" --nj 50 data/$part exp/$part/make_mfcc $mfccdir/$part

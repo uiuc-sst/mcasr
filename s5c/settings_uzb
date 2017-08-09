@@ -2,5 +2,6 @@ lang=Uzbek
 MCTranscriptdir=scrips-uzb
 lang_subdir=Uzbek/LDC2016E66/UZB_20160711
 lang_prefix=UZB
+sample_rate=44100
 pron_var=5
 stage=0
