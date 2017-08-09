@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Apply G2P with a second-order model.
+# Retry any failed words, with a first-order model.
+# Retry any still-failed words with accents removed.
+# In all 3 cases, call generate_vocab.sh.
+# The final lexicon is the concatenation of all 3,
+# namely $g2pdatadir/lexicon_autogen.1
+
 model_order=2
 pron_variants=5
 g2p_model_dir=inputs/g2p_reduced_model

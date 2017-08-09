@@ -1,5 +1,10 @@
 #!/usr/bin/python3
 
+# Remove accents from a list of words.
+# Create a de-accented word list, and a file that maps
+# original words to de-accented words, which will be read
+# by convert_words.py to restore the accents.
+
 import re
 # from collections import defaultdict
 import unicodedata

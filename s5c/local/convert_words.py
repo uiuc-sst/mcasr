@@ -1,5 +1,8 @@
 #!/usr/bin/python3
 
+# After G2P'ing words without accents, restore the accents.
+# Read the map made by remove_accents.py and make a new lexicon.
+
 from collections import defaultdict
 
 def read_word_map(mapfile):
