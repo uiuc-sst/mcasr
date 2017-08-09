@@ -7,7 +7,7 @@
 
 . path.sh || exit 1
 
-[ -z "$PYTHON" ] && PYTHON=python2.7 
+[ -z "$PYTHON" ] && PYTHON=python2.7
 
 if [ $# -lt 3 ]; then
   echo "Usage: $0 <vocab> <g2p-model-dir> <out-lexicon> [model-order [num-variants]]"
@@ -25,14 +25,14 @@ out_lexicon=$3
 
 [ ! -f $vocab ] && echo "Can't find the G2P input file: $vocab" && exit 1;
 
-if [ $# -ge 4 ]; then 
+if [ $# -ge 4 ]; then
     model_order=$4
-else 
+else
     model_order=2
 fi
-if [ $# -eq 5 ]; then 
+if [ $# -ge 5 ]; then
     num_variants=$5
-else 
+else
     num_variants=1
 fi
 
@@ -60,5 +60,4 @@ awk 'NR==FNR{p[$1]=$0; next;} {if ($1 in p) print p[$1]; else print}' \
   <(echo -e $g2p_exceptions) ${out_lexicon}.tmp >$out_lexicon || exit 1
 
 rm ${out_lexicon}.tmp
-
 exit 0

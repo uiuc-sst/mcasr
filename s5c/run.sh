@@ -5,7 +5,7 @@
 # Train and test a speech recognizer directly from mismatched transcripts.
 # Initialized by Mark Hasegawa-Johnson, 6/20/2017,
 # based on kaldi/egs/librispeech/s5/run.sh. 
-# Modified by Leda Sari, 7/19/2017.
+# Modified by Leda Sari, 7/19/2017, 7/27/2017.
 # Refactored by Camille Goudeseune.
 ####################################################################
 
@@ -41,8 +41,8 @@ g2p_model_dir=inputs/g2p_reduced_model
 g2pdatadir=data/$lang/g2p
 MCdict=$g2pdatadir/vocab.words 
 
-# Apply the trained G2P model in $g2p_model_dir.
-local/generate_vocab.sh --model_order 2 --pron_variants $pron_var $MCdict $g2p_model_dir $phoneset $g2pdatadir 
+# Apply the trained G2P model in $g2p_model_dir, via local/generate_vocab.sh.
+local/apply_g2p.sh --model_order 2 --pron_variants $pron_var $MCdict $g2p_model_dir $phoneset $g2pdatadir
 echo "Generate vocab: Done"
 
 local/ldc_lang_prep.sh $g2pdatadir data/$lang/local/dict
