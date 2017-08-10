@@ -57,12 +57,9 @@ fi
 mfccdir=mfcc
 if [ $stage -lt 4 ]; then 
 echo -e "--use-energy=false\n--sample-frequency=$sample_rate" > conf/mfcc.conf
-# # for part in LDC2016E66 LDC2016E119 LDC2016E111 ; do
-for part in $lang; do
-  steps/make_mfcc.sh --cmd "$train_cmd" --nj 50 data/$part exp/$part/make_mfcc $mfccdir/$part
-  steps/compute_cmvn_stats.sh data/$part exp/$part/make_mfcc $mfccdir/$part
-  utils/fix_data_dir.sh data/$part
-done
+steps/make_mfcc.sh --cmd "$train_cmd" --nj 50 data/$lang exp/$lang/make_mfcc $mfccdir/$lang
+steps/compute_cmvn_stats.sh data/$lang exp/$lang/make_mfcc $mfccdir/$lang
+utils/fix_data_dir.sh data/$lang
 fi
 
 # Because each of the following stages uses the previous stage's alignment
