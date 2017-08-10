@@ -1,31 +1,27 @@
 #!/bin/bash
 
 # Apply G2P with a second-order model.
-# Retry any failed words, with a first-order model.
-# Retry any still-failed words with accents removed.
-# In all 3 cases, call generate_vocab.sh.
-# The final lexicon is the concatenation of all 3,
-# namely $g2pdatadir/lexicon_autogen.1
+# Retry any failed words with a first-order model.
+# Retry any still-failed words by removing their accents.
+# In all three cases, call generate_vocab.sh.
+# The final lexicon is the cases' concatenation, $g2pdatadir/lexicon_autogen.1.
 
+# Default values for parse_options.sh.
 model_order=2
 pron_variants=5
 g2p_model_dir=inputs/g2p_reduced_model
-phoneset=inputs/phoneset.txt # Includes OOV symbol
+phoneset=inputs/phoneset.txt # Includes OOV symbol.
 
-. ./path.sh || exit 1;
-. utils/parse_options.sh || exit 1;
+. ./path.sh || exit 1
+. utils/parse_options.sh || exit 1
 
-if [ "$#" -lt 4 ]; then
-  echo "Usage: $0 <mc-vocab/dict> <G2P-model> <phone-set> <g2p-data-dir>"
-  echo "e.g.: $0 /ws/ifp-53_1/hasegawa/lsari2/data/mcasr/fromWenda/dict_grapheme.txt data/Uyghur/local/g2p"
-  exit 1
-fi
+[ "$#" -ge 4 ] || { echo "Usage: $0 mc-vocab/dict G2P-model phone-set g2p-data-dir"; exit 1; }
 # if [ "$#" -eq 5 ]; then
 #     model_order=$5
 # fi
  
 MCdict=$1
-g2pmodeldir=$2 # should be g2p_model_dir?
+g2p_model_dir=$2
 phoneset=$3
 g2pdatadir=$4
 
