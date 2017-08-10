@@ -11,16 +11,11 @@
 
 [ $# -eq 1 ] || { echo "Usage: $0 settings_file"; exit 1; }
 [ -f $1 ] || { echo "$0: missing settings file '$1'." && exit 1; }
-[ -f DATA_ROOT.txt ] || { echo "$0: missing file DATA_ROOT.txt, which specifies the MC data directory."; exit 1; }
-data=`cat DATA_ROOT.txt`
-[ -d $data ] || { echo "$0: missing directory $data, from DATA_ROOT.txt."; exit 1; }
 
 . ./cmd.sh
 . ./path.sh
-. $1 # Read settings: $lang, $MCTranscriptdir, $lang_subdir, $lang_prefix, $sample_rate, $pron_var, $stage.
-
-# Directories ./steps and ./utils are copies instead of symlinks,
-# because they have changes.
+. $1 # Read settings: $data, $lang, $MCTranscriptdir, $lang_subdir, $lang_prefix, $sample_rate, $pron_var, $stage.
+[ -d $data ] || { echo "$0: missing MC data directory $data."; exit 1; }
 
 set -e
 

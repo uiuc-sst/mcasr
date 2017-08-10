@@ -1,9 +1,7 @@
 # Called from the beginning of ./run.sh.
 
-[ -f KALDI_ROOT.txt ] || { echo "$0: missing file KALDI_ROOT.txt, which says where Kaldi is."; exit 1; }
-export KALDI_ROOT=`cat KALDI_ROOT.txt`
-[ -d $KALDI_ROOT ] || { echo "$0: missing directory ${KALDI_ROOT}, from KALDI_ROOT.txt."; exit 1; }
-
+export KALDI_ROOT=/ws/ifp-53_1/hasegawa/tools/kaldi/kaldi
+[ -d $KALDI_ROOT ] || { echo "$0: missing directory ${KALDI_ROOT}."; exit 1; }
 [ -f $KALDI_ROOT/tools/config/common_path.sh ] || { echo "$0: missing standard file $KALDI_ROOT/tools/config/common_path.sh"; exit 1; }
 export PATH=$PWD/utils/:$KALDI_ROOT/tools/openfst/bin:$PWD:$PATH
 . $KALDI_ROOT/tools/config/common_path.sh

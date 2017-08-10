@@ -3,14 +3,9 @@
 ### Get the G2P model.
 The directory `./inputs` needs the file `phoneset.txt` and the subdirectories `g2p_reduced` and `g2p_reduced_model`.
 
-### Say where the data is and where Kaldi is.
-```
-echo /ws/ifp-53_1/hasegawa/lsari2/data/speech_data1 > DATA_ROOT.txt
-echo /ws/ifp-53_1/hasegawa/tools/kaldi/kaldi > KALDI_ROOT.txt
-```
-
 ### Define variables in the settings file read by `run.sh`.
 
+`data`: Input data (with subdirectories for individual languages).
 `lang`: The language being transcribed, and the name of the subdirectories
 of the data dir `./data` and the output dirs `./exp` and `./$mfccdir`.  
 `MCTranscriptdir`: Location of transcription files. Each file corresponds to one long clip. Each line has begin and end times, and `#`-delimited transcriptions.  These files are built by a script `restitch-clips-SomeLanguage.rb` in [`0-mturk`](../0-mturk).  
@@ -25,9 +20,11 @@ Examples are in the files `settings_xxx`, for instance [`settings_uzb`](./settin
 
 ### Customize.
 
+- Say where Kaldi is.  In `path.sh`, for example, `export KALDI_ROOT=/ws/ifp-53_1/hasegawa/tools/kaldi/kaldi`.
+
 - For unusual setups for Festival, SRILM, Sequitur G2P, or Python, edit `path.sh`.
 
-- If the data has a different directory structure, edit `DATA_ROOT.txt` and `lang_subdir` to reflect that.
+- If the data has a different directory structure, reflect that in the settings file's `data` and `lang_subdir` values.
 
 - More customizations are possible in `conf/*`.  (Because `conf/mfcc.conf` is made by `run.sh`, to customize
 the former you have to edit the latter.)

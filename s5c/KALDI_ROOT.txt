@@ -1,1 +1,0 @@
-/ws/ifp-53_1/hasegawa/tools/kaldi/kaldi
