@@ -2,7 +2,7 @@
 # encoding: utf-8
 
 # Make a bigram LM from the phone sequences in Wenda's prondict.
-# On stdin, expects e.g. prondict_uzbek-from-wenda.txt or /r/lorelei/prondicts/rus-prondict-july26.txt,
+# On stdin, expects e.g. prondict_uzbek-from-wenda.txt or prondicts/rus-prondict-july26.txt,
 # where each line is a word, tab-or-space, space-delimited IPA phones.
 
 # Read those phone seqs.
@@ -24,7 +24,7 @@ if false
 end
 
 # Uzbek.
-$restrict = Hash[ "d̪","d",   "q","k",  "t̪","t",  "ɒ","a",  "ɨː","iː",  "ɸ","f",  "ʁ","r",  "χ","h" ] # That's unicode χ not US-ASCII x!
+$restrict = Hash[ "d̪","d",   "q","k",  "t̪","t",  "ɒ","a",  "ɨː","iː",  "ɸ","f",  "ʁ","r",  "χ","h" ] # Unicode χ, not US-ASCII x!
 
 # Russian.  _j is palatalized, z_ is rhotic.  Multiple phones on the output ("t s") work just fine.
 $restrict.merge! Hash[
@@ -38,13 +38,13 @@ $restrict.merge! Hash[
 "pʲ","p",
 "rʲ","r",
 "sʲ","s",
-"tʲ","t", # tʃ instead?
+"tʲ","t",
 "vʲ","v",
 "zʲ","z",
 "ts","t s",
 "tɕ","t ɕ",
 "ɕɕ","ɕ ɕ",
-"ʐ","z",
+"ʐ","z"
 ]
 
 $p = $phoneSeqs.map {|str| str.split(" ").map {|p| r=$restrict[p]; r ? r : p}}
