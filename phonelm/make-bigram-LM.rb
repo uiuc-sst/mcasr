@@ -2,10 +2,12 @@
 # encoding: utf-8
 
 # Make a bigram LM from the phone sequences in Wenda's prondict.
+# On stdin, expects e.g. prondict_uzbek-from-wenda.txt or /r/lorelei/prondicts/rus-prondict-july26.txt,
+# where each line is a word, tab-or-space, space-delimited IPA phones.
 
 # Read those phone seqs.
+$phoneSeqs = ARGF.readlines.map {|l| l.chomp} .map {|l| l.sub(/[^\s]*\s/, '').strip} .delete_if {|l| l =~ / ABORT$/}
 $phoneFile="/r/lorelei/PTgen/mcasr/phones.txt"
-$phoneSeqs = File.readlines("prondict_uzbek-from-wenda.txt").map {|l| l.chomp.split("\t")[1] .strip} .delete_if {|l| l =~ / ABORT$/}
 $phones = File.readlines($phoneFile) .map {|l| l.split[0]} .sort
 STDERR.puts "Phones parsed."
 
@@ -20,9 +22,32 @@ if false
   # Manually choose the hash's values (each key's replacement, from mcasr/phones.txt).
   exit 0
 end
-Restrict = Hash[ "d̪","d",   "q","k",  "t̪","t",  "ɒ","a",  "ɨː","iː",  "ɸ","f",  "ʁ","r",  "χ","h" ] # That's unicode χ not US-ASCII x!
 
-$p = $phoneSeqs.map {|str| str.split(" ").map {|p| r=Restrict[p]; r ? r : p}}
+# Uzbek.
+$restrict = Hash[ "d̪","d",   "q","k",  "t̪","t",  "ɒ","a",  "ɨː","iː",  "ɸ","f",  "ʁ","r",  "χ","h" ] # That's unicode χ not US-ASCII x!
+
+# Russian.  _j is palatalized, z_ is rhotic.  Multiple phones on the output ("t s") work just fine.
+$restrict.merge! Hash[
+"bʲ","b",
+"dʲ","d",
+"fʲ","f",
+"kʲ","k",
+"lʲ","l",
+"mʲ","m",
+"nʲ","n",
+"pʲ","p",
+"rʲ","r",
+"sʲ","s",
+"tʲ","t", # tʃ instead?
+"vʲ","v",
+"zʲ","z",
+"ts","t s",
+"tɕ","t ɕ",
+"ɕɕ","ɕ ɕ",
+"ʐ","z",
+]
+
+$p = $phoneSeqs.map {|str| str.split(" ").map {|p| r=$restrict[p]; r ? r : p}}
 STDERR.puts "Phones restricted."
 
 $tmpPhones = "/tmp/phones-for-bigram.txt"
