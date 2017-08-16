@@ -7,9 +7,12 @@
 
 To adjust how many turkers transcribe each HIT:
 
-- Edit Project, Setting up your HIT, Number of assignments per HIT: type in a number between 5 and 10.
+- Edit Project, Setting up your HIT, Number of assignments per HIT: type in a number between 1 and 10.
 
 Bigger numbers reduce noise, but obviously cost proportionally more.
+However, it's simpler to **just use 1** and resubmit the batch file (see below) whenever the current batch nears completion,
+because that gradually improves the quality of all the transcriptions.  Just cease resubmitting when
+the quality is high enough, or when there's not enough money left.
 
 ### Get a collection of recordings of speech.
 In .wav format, mono, preferably with a uniform sampling rate (22050 Hz).
@@ -35,11 +38,11 @@ It runs at about 3 minutes per hour of input audio.
 [`./make-csv.rb myTest > foo.csv`](./make-csv.rb)
 
 ### Submit the batch file `foo.csv` to Mechanical Turk's *Publish Batch.*
-If needed, first split it into quarters (each starting with the
+<!-- If needed, first split it into quarters (each starting with the
 original's first line), and submit it only one quarter at a time.
 That yields intermediate results more quickly, because each quarter of
 the clips completes before new clips start.  It also lets you fund
-the account a little at a time.
+the account a little at a time. -->
 
 #### As turkers work, approve or reject their HITs.
 
