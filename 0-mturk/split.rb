@@ -44,10 +44,11 @@ Dir.glob("*.wav") {|wav|
 
     if false
       ampl = `sox #$tmp -n stat 2>&1 |grep "RMS     amplitude"`.split[2].to_f
-      # 0.01 is too high a threshold: most of the 422 marked-silent clips had music and speech.
+      # 0.01 is too high a threshold: for July 2017's Russian corpus,
+      # most of 422 marked-silent clips had music and speech.
       # Of the 391 clips that 0.01 called silent but 0.0001 didn't, 18% had transcribable speech.
       # At 0.0001, 32 clips were marked silent.  That's not worth the trouble.
-      # Maybe it'd be worth it if $slice were much shorter.
+      # Culling silent clips might be worthwhile, were $slice much shorter.
       if ampl < 0.0001
 	$clipsSilent << clip
 	next
