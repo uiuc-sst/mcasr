@@ -26,7 +26,7 @@ Make a pronunciation lexicon of English nonsense words, which Kaldi calls `lexic
 (a) Its vocabulary is the space-delimited words in Turker transcripts.
 (b) Find each word's pronunciation.  Because the transformation www.isle.illinois.edu/sst/data/g2ps/English/English_ref_orthography_dict.html yields too many candidate pronunciations for each nonsense word, use [ISLEdict](www.isle.illinois.edu/sst/data/g2ps/English/ISLEdict.html) and [Sequitur](https://github.com/sequitur-g2p/sequitur-g2p) to train an English g2p, and then ask Sequitur to report the ten most likely pronunciations of each nonsense word, together with their probabilities, in  `lexiconp.txt`.
 
-Scripts are in the subfolder [1-nonsenseDict](./1-nonsenseDict).
+If the vocabulary needs shrinking, use the scripts in the subfolder [1-nonsenseDict](./1-nonsenseDict).
 The script [split-words.rb](1-nonsenseDict/split-words.rb) will also preprocess turker transcripts (like <https://github.com/uiuc-sst/PTgen/blob/master/steps/preprocess_turker_transcripts.pl>).
 
 ### 2. English ASR and forced alignment
