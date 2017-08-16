@@ -4,18 +4,11 @@
 # split it into clips, each slightly shorter than 1.25 seconds,
 # named foo-usecStart-usecEnd.mp3 and .ogg.
 #
-# # For silent clips, instead of creating them,
-# # accumulate their names into a .csv batchfile that pretends
-# # to have come from turkers who transcribed them as "[silence]".
-#
 # Makes about 2800 clips per minute, singlethreaded.
 # Runs at 18x real time, in other words.
-#
-# (Scavenged from PTgen/mturk/split.rb.)
 
-$slice = 1.25 # longest duration of a clip, in seconds
+$slice = 1.25 # Longest duration of a clip, in seconds.
 $tmp = "/tmp/a.wav"
-# $clipsSilent = []
 `rm -rf #$tmp /tmp/a; mkdir /tmp/a`
 
 begin
@@ -28,6 +21,7 @@ begin
   STDERR.puts "Splitting #{c} .wav files into about #{(d/$slice).to_i*2} clips..."
 end
 
+# Before multithreading this loop, make a different $tmp for each thread.
 Dir.glob("*.wav") {|wav|
   dur = `sfinfo #{wav} | grep Duration`.split[1].to_f
   n = (dur/$slice).ceil
@@ -42,28 +36,12 @@ Dir.glob("*.wav") {|wav|
     usecEnd = ((i+1)*l * 1e6).to_i - 1
     clip = "#{wav[0..-5]}-#{usecBgn}-#{usecEnd}"
 
-    if false
-      ampl = `sox #$tmp -n stat 2>&1 |grep "RMS     amplitude"`.split[2].to_f
-      # 0.01 is too high a threshold: for July 2017's Russian corpus,
-      # most of 422 marked-silent clips had music and speech.
-      # Of the 391 clips that 0.01 called silent but 0.0001 didn't, 18% had transcribable speech.
-      # At 0.0001, 32 clips were marked silent.  That's not worth the trouble.
-      # Culling silent clips might be worthwhile, were $slice much shorter.
-      if ampl < 0.0001
-	$clipsSilent << clip
-	next
-      end
-    end
-
     # Transcode to mp3 and to ogg.
     `sox #$tmp -C 160.2 /tmp/a/#{clip}.mp3` # 160 kbps
     `sox #$tmp -C 9     /tmp/a/#{clip}.ogg` # about 125 kbps
   }
 }
 `rm -rf #$tmp`
-# File.open("clipsSilent.txt", "w") {|f| f.puts $clipsSilent.sort }
-# STDERR.puts "Culled #{$clipsSilent.size} silent clips."
-# STDERR.puts "Todo: convert clipsSilent.txt into a .csv batchfile."
 
 $out = "/tmp/turkAudio.tar"
 `rm -rf #$out; cd /tmp/a && tar cf #$out .`
