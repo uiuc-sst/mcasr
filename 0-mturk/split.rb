@@ -11,19 +11,25 @@ $slice = 1.25 # Longest duration of a clip, in seconds.
 $tmp = "/tmp/a.wav"
 `rm -rf #$tmp /tmp/a; mkdir /tmp/a`
 
+def seconds(wav)
+# `sfinfo #{wav} | grep Duration`.split[1].to_f
+  `soxi -D #{wav}`.to_f
+end
+
 begin
   c = 0
   d = 0.0
   Dir.glob("*.wav") {|wav|
     c += 1
-    d += `sfinfo #{wav} | grep Duration`.split[1].to_f
+    d += seconds(wav)
   }
-  STDERR.puts "Splitting #{c} .wav files into about #{(d/$slice).to_i*2} clips..."
+  STDERR.puts "Splitting #{c} .wav files, totaling #{'%.1f' % (d/3600.0)} hours, into about #{(d/$slice).to_i*2} clips..."
+  STDERR.puts "This should take about #{(d/1200).to_i} minutes."
 end
 
 # Before multithreading this loop, make a different $tmp for each thread.
 Dir.glob("*.wav") {|wav|
-  dur = `sfinfo #{wav} | grep Duration`.split[1].to_f
+  dur = seconds(wav)
   n = (dur/$slice).ceil
   l = dur/n
   puts "Splitting #{wav}, #{dur} s, into #{n} clips each #{'%.2f' % l} s long." if false
