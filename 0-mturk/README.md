@@ -17,10 +17,18 @@ the quality is high enough, or when there's not enough money left.
 ### Get a collection of recordings of speech.
 In .wav format, mono, preferably with a uniform sampling rate (22050 Hz).
 
+- If the audio files are in a tree of subdirectories, collect them:
+```
+mkdir /tmp/wavs
+cd rootOfTree
+cp `find . -name \*.flac` /tmp/wavs
+cd /tmp/wavs
+```
+
 - If they're in .flac format, first convert them to .wav, to avoid a bug in sox:
 
 `for f in *.flac; do sox "$f" "$( basename ${f%.flac}.wav )"; done;`
-    
+
 ### Split each .wav into clips of about 1.25 seconds, in .mp3 and .ogg format.
 
 - [`./split.rb`](./split.rb)
