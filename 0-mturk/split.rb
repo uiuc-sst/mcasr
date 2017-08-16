@@ -23,7 +23,8 @@ begin
     c += 1
     d += seconds(wav)
   }
-  STDERR.puts "Splitting #{c} .wav files into about #{(d/$slice).to_i*2} clips..."
+  STDERR.puts "Splitting #{c} .wav files, totaling #{'%.1f' % (d/3600.0)} hours, into about #{(d/$slice).to_i*2} clips..."
+  STDERR.puts "This should take about #{(d/1200).to_i} minutes."
 end
 
 # Before multithreading this loop, make a different $tmp for each thread.
