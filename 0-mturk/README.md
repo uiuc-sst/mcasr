@@ -43,9 +43,12 @@ It runs at about 3 minutes per hour of input audio.
 - `tar xf turkAudio.tar; rm turkAudio.tar`
 
 ### Create a "Batch file."
-[`./make-csv.rb myTest > foo.csv`](./make-csv.rb)
+- [`./make-csv.rb myTest > foo.csv`](./make-csv.rb)
+- View `foo.csv` and spot-check some of the URLs therein.  For example, `play http://isle.illinois.edu/mc/oromo/IL6_EVAL_043_017-78177272-79418180.mp3` should make a sound, instead of returning an error from that web server.
 
-### Submit the batch file `foo.csv` to Mechanical Turk's *Publish Batch.*
+### Submit that batch file to Mechanical Turk.
+- Click on Mechanical Turk's *Create*, find your project (probably at the top of the list),
+click on *Publish Batch*, and choose your `foo.csv` file.
 <!-- If needed, first split it into quarters (each starting with the
 original's first line), and submit it only one quarter at a time.
 That yields intermediate results more quickly, because each quarter of
