@@ -57,7 +57,7 @@ $restrict.merge! Hash[
 "q","k",
 # "ts","t s",
 "tʃʰ","t ʃ",
-"tʰ","t"
+"tʰ","t" # Or "t h".  Too close to "earball"; see how it affects the end result.
 ]
 
 # Oromo.
