@@ -2,8 +2,11 @@
 # encoding: utf-8
 
 # Make a bigram LM from the phone sequences in Wenda's prondict.
-# On stdin, expects e.g. prondict_uzbek-from-wenda.txt or prondicts/rus-prondict-july26.txt,
-# where each line is a word, tab-or-space, space-delimited IPA phones.
+# On stdin, expects e.g.
+#   prondict_uzbek-from-wenda.txt
+#   prondicts/rus-prondict-july26.txt
+#   prondicts/Tigrinya/prondict-from-amharic-phones.txt
+# where each line is:  word, tab-or-space, space-delimited IPA phones.
 
 # Read those phone seqs.
 $phoneSeqs = ARGF.readlines.map {|l| l.chomp} .map {|l| l.sub(/[^\s]*\s/, '').strip} .delete_if {|l| l =~ / ABORT$/}
@@ -45,6 +48,31 @@ $restrict.merge! Hash[
 "tɕ","t ɕ",
 "ɕɕ","ɕ ɕ",
 "ʐ","z"
+]
+
+# Tigrinya, using Amharic phones.  _h is aspirated.
+$restrict.merge! Hash[
+"eː","e",
+"pʰ","p h",
+"q","k",
+# "ts","t s",
+"tʃʰ","t ʃ",
+"tʰ","t"
+]
+
+# Oromo.
+$restrict.merge! Hash[
+"ai","a i",
+"au","a u",
+"ɑi","ɑ i",
+"ɑu","ɑ u",
+"ɔu","ɔ u",
+"ɛi","ɛ i",
+"ɞi","ɝ i",
+"ɞu","ɝ u",
+"ɢ","k", # uvular plosive
+"ʕ"," ",
+# "χ","h"
 ]
 
 $p = $phoneSeqs.map {|str| str.split(" ").map {|p| r=$restrict[p]; r ? r : p}}
