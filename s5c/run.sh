@@ -52,7 +52,7 @@ fi
 mfccdir=mfcc
 if [ $stage -lt 4 ]; then 
 echo -e "--use-energy=false\n--sample-frequency=$sample_rate" > conf/mfcc.conf
-steps/make_mfcc.sh --cmd "$train_cmd" --nj 50 data/$lang exp/$lang/make_mfcc $mfccdir/$lang
+steps/make_mfcc.sh --cmd "$train_cmd" --nj 45 data/$lang exp/$lang/make_mfcc $mfccdir/$lang
 steps/compute_cmvn_stats.sh data/$lang exp/$lang/make_mfcc $mfccdir/$lang
 utils/fix_data_dir.sh data/$lang
 fi
@@ -63,10 +63,10 @@ fi
 if [ $stage -lt 5 ]; then
 # #################################################################
 # train a monophone system
-steps/train_mono.sh --boost-silence 1.0 --nj 50 --cmd "$train_cmd" \
+steps/train_mono.sh --boost-silence 1.0 --nj 45 --cmd "$train_cmd" \
   data/$lang data/$lang/lang exp/$lang/mono
 
-steps/align_si.sh --boost-silence 1.0 --nj 50 --cmd "$train_cmd" \
+steps/align_si.sh --boost-silence 1.0 --nj 45 --cmd "$train_cmd" \
   data/$lang data/$lang/lang exp/$lang/mono exp/$lang/mono_ali
 
 # ####################################################################
@@ -74,7 +74,7 @@ steps/align_si.sh --boost-silence 1.0 --nj 50 --cmd "$train_cmd" \
 steps/train_deltas.sh --boost-silence 1.0 --cmd "$train_cmd" \
     2000 10000 data/$lang data/$lang/lang exp/$lang/mono_ali exp/$lang/tri1
 
-steps/align_si.sh --nj 50 --cmd "$train_cmd" \
+steps/align_si.sh --nj 45 --cmd "$train_cmd" \
   data/$lang data/$lang/lang exp/$lang/tri1 exp/$lang/tri1_ali
 
 # ##########
@@ -96,7 +96,7 @@ steps/train_lda_mllt.sh --cmd "$train_cmd" \
 #   utils/mkgraph.sh data/lang_nosp_test_tgsmall \
 #     exp/tri2b exp/tri2b/graph_nosp_tgsmall
 #   for test in test_clean test_other dev_clean dev_other; do
-#     steps/decode.sh --nj 50 --cmd "$decode_cmd" exp/tri2b/graph_nosp_tgsmall \
+#     steps/decode.sh --nj 45 --cmd "$decode_cmd" exp/tri2b/graph_nosp_tgsmall \
 #       data/$test exp/tri2b/decode_nosp_tgsmall_$test
 #     steps/lmrescore.sh --cmd "$decode_cmd" data/lang_nosp_test_{tgsmall,tgmed} \
 #       data/$test exp/tri2b/decode_nosp_{tgsmall,tgmed}_$test
@@ -107,7 +107,7 @@ steps/train_lda_mllt.sh --cmd "$train_cmd" \
 # )&
 
 # ... --use-graphs true \
-steps/align_si.sh  --nj 50 --cmd "$train_cmd" \
+steps/align_si.sh  --nj 45 --cmd "$train_cmd" \
   data/$lang data/$lang/lang exp/$lang/tri2b exp/$lang/tri2b_ali
 fi
 
@@ -119,7 +119,7 @@ steps/train_sat.sh --cmd "$train_cmd" 2500 15000 \
   data/$lang data/$lang/lang exp/$lang/tri2b_ali exp/$lang/tri3b
 
 # # align the entire train_clean_100 subset using the tri3b model
-steps/align_fmllr.sh --nj 50 --cmd "$train_cmd" \
+steps/align_fmllr.sh --nj 45 --cmd "$train_cmd" \
   data/$lang data/$lang/lang \
   exp/$lang/tri3b exp/$lang/tri3b_ali
 fi
@@ -133,7 +133,7 @@ steps/train_sat.sh  --cmd "$train_cmd" 4200 40000 \
   exp/$lang/tri3b_ali exp/$lang/tri4b
 
 # align using the tri4b model
-steps/align_fmllr.sh --nj 50 --cmd "$train_cmd" \
+steps/align_fmllr.sh --nj 45 --cmd "$train_cmd" \
   data/$lang data/$lang/lang exp/$lang/tri4b exp/$lang/tri4b_ali
 
 # ##################
@@ -152,5 +152,5 @@ fi
 # if [ $stage -lt 10 ]; then 
 #     [ -f exp/$lang/tri5a_${layers}_nnet/final.mdl ] || { echo 'No nnet file' ; exit 1 ; } ;
 #     # nj 30 due to tri4b_ali
-#     steps/nnet2/align.sh --nj 50 --transform-dir exp/$lang/tri4b_ali data/$lang data/$lang/lang exp/$lang/tri5a_${layers}_nnet exp/$lang/tri5a_${layers}_nnet_ali
+#     steps/nnet2/align.sh --nj 45 --transform-dir exp/$lang/tri4b_ali data/$lang data/$lang/lang exp/$lang/tri5a_${layers}_nnet exp/$lang/tri5a_${layers}_nnet_ali
 # fi
