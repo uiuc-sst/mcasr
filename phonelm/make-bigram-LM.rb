@@ -8,23 +8,18 @@
 #   prondicts/Tigrinya/prondict-from-amharic-phones.txt
 # where each line is:  word, tab-or-space, space-delimited IPA phones.
 
-# Read those phone seqs.
-$phoneSeqs = ARGF.readlines.map {|l| l.chomp} .map {|l| l.sub(/[^\s]*\s/, '').strip} .delete_if {|l| l =~ / ABORT$/}
+# Read the prondict.
+# For each line, discard the word and keep the phone sequence.
+# Discard truncated phone sequences (ABORT).
+# Remove Tigrinya punctuation from phone sequences ([preface_colon], [phrase], etc.)
+$phoneSeqs = ARGF.readlines.map {|l| l.chomp} \
+  .map {|l| l.sub(/[^\s]*\s/, '').strip} \
+  .delete_if {|l| l =~ / ABORT$/} \
+  .map {|l| l.gsub /\[[a-z_]*\]/, ''}
+
 $phoneFile="/r/lorelei/PTgen/mcasr/phones.txt"
 $phones = File.readlines($phoneFile) .map {|l| l.split[0]} .sort
 STDERR.puts "Phones parsed."
-
-if false
-  require 'set'
-  used = Set.new
-  $phoneSeqs.sort.uniq.each {|s| used.merge s.split(" ") }
-  used = used.to_a.sort
-  STDERR.puts "These input phones lie outside mcasr/phones.txt:"
-  STDERR.puts ($phones + used) - $phones
-  # Use the result of this as the keys for the hash Restrict, below.
-  # Manually choose the hash's values (each key's replacement, from mcasr/phones.txt).
-  exit 0
-end
 
 # Uzbek.
 $restrict = Hash[ "d̪","d",   "q","k",  "t̪","t",  "ɒ","a",  "ɨː","iː",  "ɸ","f",  "ʁ","r",  "χ","h" ] # Unicode χ, not US-ASCII x!
@@ -47,7 +42,7 @@ $restrict.merge! Hash[
 "ts","t s",
 "tɕ","t ɕ",
 "ɕɕ","ɕ ɕ",
-"ʐ","z"
+"ʐ","z",
 ]
 
 # Tigrinya, using Amharic phones.  _h is aspirated.
@@ -57,7 +52,18 @@ $restrict.merge! Hash[
 "q","k",
 # "ts","t s",
 "tʃʰ","t ʃ",
-"tʰ","t" # Or "t h".  Too close to "earball"; see how it affects the end result.
+"tʰ","t", # Or "t h".  Too close to "earball"; see how it affects the end result.
+"p'","p",
+"q","k",
+"t'","t",
+"ts'","t s",
+"tʃ'","t ʃ",
+"ħ","h",
+"ʷa","a",
+"ʷe","e",
+"ʷi","i",
+"ʷə","ə",
+"ʷɨ","ɨ",
 ]
 
 # Oromo.
@@ -75,7 +81,35 @@ $restrict.merge! Hash[
 # "χ","h"
 ]
 
-$p = $phoneSeqs.map {|str| str.split(" ").map {|p| r=$restrict[p]; r ? r : p}}
+def restrict(ph) r=$restrict[ph]; r ? r : ph end
+
+if false
+  require 'set'
+  used = Set.new
+  $phoneSeqs.sort.uniq.each {|s| used.merge s.split(" ") }
+  used = used.to_a.sort
+  missing = ($phones + used) - $phones
+  if missing.empty?
+    puts "All input phones are found in mcasr/phones.txt.  Good."
+  else
+    puts "These input phones lie outside mcasr/phones.txt:"
+    puts missing.inspect
+  end
+  # Restrict the phones in "used", and split multiple phones apart (split and flatten).
+  used = used.map {|ph| restrict(ph).split(/\s/)} .flatten
+  missing = ($phones + used) - $phones
+  if missing.empty?
+    puts "After restricting, all input phones are found in mcasr/phones.txt.  Good."
+  else
+    puts "After restricting, these input phones lie outside mcasr/phones.txt:"
+    puts missing.inspect
+  end
+  # Use the result of this as the keys for the hash $restrict.
+  # Manually choose the hash's values (each key's replacement, from mcasr/phones.txt).
+  exit 0
+end
+
+$p = $phoneSeqs.map {|str| str.split(" ").map {|p| restrict(p)}}
 STDERR.puts "Phones restricted."
 
 $tmpPhones = "/tmp/phones-for-bigram.txt"
