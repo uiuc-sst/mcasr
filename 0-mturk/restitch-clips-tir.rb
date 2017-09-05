@@ -1,13 +1,13 @@
 #!/usr/bin/env ruby
 
 # Stitch turkers' transcriptions for Tigrinya 2017-08-17.
-# Report timings in microseconds.  SR = 22050 Hz, if that matters.
+# Report timings in microseconds.
 
 # Clip: "http://isle.illinois.edu/mc/2018-08-17-tir/TIR_103_019-96094050-97342024.mp3"
 # Transcription: "spud prudish perkumni".
 # For each wavfile i.e. clip, hash to an array of transcriptions.
 transcriptions = Hash.new {|k,v| k[v] = []}
-Cheaters = %w(A1IOMFFEKCWOIT A1ZSFIIIU3WH9G A23F4NFSHEZMDL A28FMRMS9TMEOZ A298J6JKK4Q2XN A2FZ88OU42EFC8 A2MPEH2IT5MWKW A2PU4YNWITAQVL A2S2OS8CIO5END A2VI8XH6A1PB27 A33BMZB3JCJWDS A3DDIOMFJ5UUNV A3GMT4AGHPT362 A3Q1YUOX8U5O6C A3VHDQR8A9JJ4F A68Q94ZY24XAL AEBETUY5OD68H AMMER6L16WFVS AP9YUQ68FFZKY AXZJZZDA4FBJ3 AYFHTI4Y6RG83)
+Cheaters = %w(A1IOMFFEKCWOIT A1ZSFIIIU3WH9G A23F4NFSHEZMDL A28FMRMS9TMEOZ A298J6JKK4Q2XN A2FZ88OU42EFC8 A2MPEH2IT5MWKW A2PU4YNWITAQVL A2S2OS8CIO5END A2VI8XH6A1PB27 A33BMZB3JCJWDS A35T6IAX6MHNHC A3DDIOMFJ5UUNV A3GMT4AGHPT362 A3Q1YUOX8U5O6C A3VHDQR8A9JJ4F A68Q94ZY24XAL AEBETUY5OD68H AMMER6L16WFVS AP9YUQ68FFZKY AXZJZZDA4FBJ3 AYFHTI4Y6RG83)
 
 # Parse the original batchfile into a table of [clip, "transcription"].
 # Each line: the "TIR_103_019-96094050-97342024.mp3"'s, then the last 8 column-delimited "strings".
@@ -20,7 +20,7 @@ CSV.foreach('/r/lorelei/aug/bat/tir/all.csv') {|r|
   wavs = r[27..42].select {|c| c =~ /mp3/} \
     .map {|l| l.sub("http://isle.illinois.edu/mc/tigrinya/IL5_EVAL_", "") .sub(".mp3", "") } \
     .map {|l| a = l.split "-"; [a[0], a[1].to_i, a[2].to_i]}
-  # These timings are in microseconds, not in 1/22050 of a second.
+  # These timings are in microseconds.
   scrips = r[45..52]
   next if wavs.size != 8 || scrips.size != 8 # This is a header line.  Ignore it.
   next if r[16] != "Approved" # about 3700 of 74000
