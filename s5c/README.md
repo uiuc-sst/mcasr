@@ -5,16 +5,16 @@ The directory `./inputs` needs the file `phoneset.txt` and the subdirectories `g
 
 ### Define variables in the settings file read by `run.sh`.
 
-`data`: Input data (with subdirectories for individual languages).
-`lang`: The language being transcribed, and the name of the subdirectories
+**`data`**: Input data (with subdirectories for individual languages).  
+**`lang`**: The language being transcribed, and the name of the subdirectories
 of the data dir `./data` and the output dirs `./exp` and `./$mfccdir`.  
-`MCTranscriptdir`: Location of transcription files. Each file corresponds to one long clip. Each line has begin and end times, and `#`-delimited transcriptions.  These files are built by a script `restitch-clips-SomeLanguage.rb` in [`0-mturk`](../0-mturk).  
-`pron_var`: Number of pronunciation variants for lexicon generation.  
-`lang_subdir`: Location of language data under `DATA_ROOT.txt`.  
-`lang_prefix`: Optional prefix of each file in MCTranscriptdir (so 001_001.txt becomes UZB_001_001.txt: see `utt_prefix` in `local/generate_data.py`).  
-`sample_rate`: Sample rate, in Hz, of the audio files in `lang_subdir`.  
-`scrip_timing_in_samples=true`: Normally omitted.  Define this only if the time offsets in `MCTranscriptdir/*` are in samples (old way) rather than microseconds.  
-`stage`: One less than the stage to resume from (to skip early stages when rerunning).  
+**`MCTranscriptdir`**: Location of transcription files. Each file corresponds to one long clip. Each line has begin and end times, and `#`-delimited transcriptions.  These files are built by a script `restitch-clips-SomeLanguage.rb` in [`0-mturk`](../0-mturk).  
+**`pron_var`**: Number of pronunciation variants for lexicon generation.  
+**`lang_subdir`**: Location of language data under `DATA_ROOT.txt`.  
+**`lang_prefix`**: Optional prefix of each file in MCTranscriptdir (so 001_001.txt becomes UZB_001_001.txt: see `utt_prefix` in `local/generate_data.py`).  
+**`sample_rate`**: Sample rate, in Hz, of the audio files in `lang_subdir`.  
+**`scrip_timing_in_samples=true`**: Normally omitted.  Define this only if the time offsets in `MCTranscriptdir/*` are in samples (old way) rather than microseconds.  
+**`stage`**: One less than the stage to resume from (to skip early stages when rerunning).  
 
 Examples are in the files `settings_xxx`, for instance [`settings_uzb`](./settings_uzb) for Uzbek.
 
