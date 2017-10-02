@@ -1,9 +1,11 @@
 ## Leda Sari's scripts.
 
 ### Get a G2P model.
-The directory `./inputs` needs the file `phoneset.txt`, the subdirectory `g2p_reduced`
-(with files dict.plain, dict.clean, final.phoneset, final.oldID2newID, lexicon_autogen.1, vocab.plain, vocab.all)
-and the subdirectory `g2p_reduced_model` (with files model-1, model-2, model-3).
+Into the directory `./inputs`, put:  
+- the file `phoneset.txt`  
+- the subdirectory `g2p_reduced`
+(with files dict.plain, dict.clean, final.phoneset, final.oldID2newID, lexicon_autogen.1, vocab.plain, vocab.all)  
+- the subdirectory `g2p_reduced_model` (with files model-1, model-2, model-3).
 
 ### Define variables in the settings file.
 
@@ -14,10 +16,10 @@ Examples of a settings file are `settings_xxx`, e.g. [`settings_uzb`](./settings
 of the data dir `./data` and the output dirs `./exp` and `./$mfccdir`.  
 **`MCTranscriptdir`**: Subdirectory containing transcriptions such as `999_999.txt`. Each file corresponds to one long clip. Each line has begin and end times, and `#`-delimited transcriptions.  These files are built by a script `restitch-clips-SomeLanguage.rb` in [`0-mturk`](../0-mturk).  
 **`pron_var`**: Number of pronunciation variants for lexicon generation.  
-**`lang_subdir`**: Subtree of `data` containing `.flac` audio files.  
+**`lang_subdir`**: Subtree of `$data` containing `.flac` audio files.  
 **`lang_prefix`**: Optional prefix of each file in `$MCTranscriptdir` (so 001_001.txt becomes UZB_001_001.txt: see `utt_prefix` in `local/generate_data.py`).  
-**`sample_rate`**: Sample rate, in Hz, of the audio files in `lang_subdir`.  
-**`scrip_timing_in_samples=true`**: Normally omitted.  Defined only if the time offsets in `MCTranscriptdir/*` are in samples (old way) rather than microseconds.  
+**`sample_rate`**: Sample rate, in Hz, of the audio files in `$lang_subdir`.  
+**`scrip_timing_in_samples=true`**: Normally omitted.  Defined only if the time offsets in `$MCTranscriptdir/*` are in samples (old way) rather than microseconds.  
 **`stage`**: One less than the stage to resume from (to skip early stages when rerunning).  
 
 ### Customize.
