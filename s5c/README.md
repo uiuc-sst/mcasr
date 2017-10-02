@@ -14,12 +14,15 @@ Examples of a settings file are `settings_xxx`, e.g. [`settings_uzb`](./settings
 **`data`**: Input data (with subdirectories for individual languages).  
 **`lang`**: The language being transcribed, and the name of the subdirectories
 of the data dir `./data` and the output dirs `./exp` and `./$mfccdir`.  
+
 **`MCTranscriptdir`**: Subdirectory containing transcriptions such as `999_999.txt`. Each file corresponds to one long clip. Each line has begin and end times, and `#`-delimited transcriptions.  These files are built by a script `restitch-clips-SomeLanguage.rb` in [`0-mturk`](../0-mturk).  
-**`pron_var`**: Number of pronunciation variants for lexicon generation.  
-**`lang_subdir`**: Subtree of `$data` containing `.flac` audio files.  
 **`lang_prefix`**: Optional prefix of each file in `$MCTranscriptdir` (so 001_001.txt becomes UZB_001_001.txt: see `utt_prefix` in `local/generate_data.py`).  
-**`sample_rate`**: Sample rate, in Hz, of the audio files in `$lang_subdir`.  
 **`scrip_timing_in_samples=true`**: Normally omitted.  Defined only if the time offsets in `$MCTranscriptdir/*` are in samples (old way) rather than microseconds.  
+
+**`lang_subdir`**: Subtree of `$data` containing `.flac` or `.wav` audio files.  
+**`sample_rate`**: Sample rate, in Hz, of the audio files in `$lang_subdir`.  
+
+**`pron_var`**: Number of pronunciation variants for lexicon generation.  
 **`stage`**: One less than the stage to resume from (to skip early stages when rerunning).  
 
 ### Customize.
