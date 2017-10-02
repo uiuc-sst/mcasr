@@ -4,11 +4,11 @@ export LC_ALL=en_US.UTF-8
 
 # todo: If $MCTranscriptdir has no *.txt, abort!  Maybe the scrips are accidentally in a subdir.
 
+[ -d $data/$lang_subdir ] || { echo "Missing data/lang_subdir directory of .flac files '$data/$lang_subdir'. Check the settings file."; exit 1; }
+
 dst=data/$lang
 mkdir -p $dst
-for d in $data/$lang_subdir/*/AUDIO; do
-  ls $d/*.flac 
-done > $dst/all.flist
+find $data/$lang_subdir -type f -name \*.flac > $dst/all.flist
 wavdir=$dst/wav
 mkdir -p $wavdir
 
