@@ -26,24 +26,25 @@ if [ ! -s $flist ]; then
   rm $flist
   exit 1
 fi
-wavdir=$dst/wav
-mkdir -p $wavdir
 
-nbits=16
-sox_options="-t $audioformat -r $sample_rate -e signed-integer -b $nbits"
+# Rebuild $wavdir, $olist, and $wavscp from $flist, even if those already exist.
+wavdir=$dst/wav
 olist=$dst/wav.list
 wavscp=$dst/wav.scp
-# Rebuild $wavdir, $wavscp, and $olist from $flist, even if those already exist.
+rm -rf $wavdir; mkdir -p $wavdir
+>| $olist
+>| $wavscp
 while read line; do 
   bname=$(basename $line)
   bname=${bname%.$audioformat}
-  sox $sox_options $line -t wav $wavdir/${bname}.wav
+  wav=$wavdir/${bname}.wav
+  sox -t $audioformat -r $sample_rate -e signed-integer -b 16 $line -t wav $wav
 
   # Skip any file shorter than 1000 samples.
-  nsamples=`soxi -s "$wavdir/${bname}.wav"`
+  nsamples=`soxi -s "$wav"`
   if [[ "$nsamples" -gt 1000 ]]; then 
-    echo "$wavdir/${bname}.wav" >> $olist
-    echo "$bname $wavdir/${bname}.wav" >> $wavscp
+    echo $wav >> $olist
+    echo $bname $wav >> $wavscp
   fi
 done < $flist
 
