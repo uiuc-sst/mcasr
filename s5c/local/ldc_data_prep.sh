@@ -4,19 +4,24 @@ export LC_ALL=en_US.UTF-8
 
 # todo: If $MCTranscriptdir has no *.txt, abort!  Maybe the scrips are accidentally in a subdir.
 
-[ -d $data/$lang_subdir ] || { echo "Missing data/lang_subdir directory of audio files '$data/$lang_subdir'. Check the settings file. Aborting."; exit 1; }
+[ -d $data/$lang_subdir ] || { echo "Missing data/lang_subdir of audio files '$data/$lang_subdir'. Check the settings file. Aborting."; exit 1; }
+[ -d $MCTranscriptdir ] || { echo "Missing MCTranscriptdir of transcriptions '$MCTranscriptdir'. Check the settings file. Aborting."; exit 1; }
+
+find $MCTranscriptdir -type f -name \*.txt > /tmp/$$
+[ -s /tmp/$$ ] || { echo "No .txt files in $MCTranscriptdir. Aborting."; rm /tmp/$$; exit 1; }
+rm /tmp/$$
 
 dst=data/$lang
 mkdir -p $dst
 flist=$dst/all.flist
 audioformat=flac
 find $data/$lang_subdir -type f -name \*.$audioformat > $flist
-if [[ ! -s $flist ]]; then
+if [ ! -s $flist ]; then
   # Found no .flac files.  Try .wav instead.
   audioformat=wav
   find $data/$lang_subdir -type f -name \*.$audioformat > $flist
 fi
-if [[ ! -s $flist ]]; then
+if [ ! -s $flist ]; then
   echo "No .flac or .wav files in '$data/$lang_subdir'. Aborting."
   rm $flist
   exit 1
