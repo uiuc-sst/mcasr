@@ -1,9 +1,5 @@
 #!/bin/bash
 
-export LC_ALL=en_US.UTF-8
-
-# todo: If $MCTranscriptdir has no *.txt, abort!  Maybe the scrips are accidentally in a subdir.
-
 [ -d $data/$lang_subdir ] || { echo "Missing data/lang_subdir of audio files '$data/$lang_subdir'. Check the settings file. Aborting."; exit 1; }
 [ -d $MCTranscriptdir ] || { echo "Missing MCTranscriptdir of transcriptions '$MCTranscriptdir'. Check the settings file. Aborting."; exit 1; }
 
@@ -32,21 +28,31 @@ wavdir=$dst/wav
 olist=$dst/wav.list
 wavscp=$dst/wav.scp
 rm -rf $wavdir; mkdir -p $wavdir
->| $olist
->| $wavscp
-while read line; do 
-  bname=$(basename $line)
-  bname=${bname%.$audioformat}
-  wav=$wavdir/${bname}.wav
-  sox -t $audioformat -r $sample_rate -e signed-integer -b 16 $line -t wav $wav
-
-  # Skip any file shorter than 1000 samples.
-  nsamples=`soxi -s "$wav"`
-  if [[ "$nsamples" -gt 1000 ]]; then 
-    echo $wav >> $olist
-    echo $bname $wav >> $wavscp
-  fi
-done < $flist
+# Split the input file $flist, run sox in parallel,
+# then join the output fragments into $olist and $wavscp.
+nparallel=`nproc | sed "s/$/-1/" | bc`	# One fewer than the number of CPU cores.
+rm -f $flist.* $olist.* $wavscp.*
+split --numeric-suffixes=1 -n r/$nparallel $flist $flist.
+for i in `seq -f %02g $nparallel`; do
+  (
+    while read line; do
+      bname=$(basename $line)
+      bname=${bname%.$audioformat}
+      wav=$wavdir/${bname}.wav
+      sox -t $audioformat -r $sample_rate -e signed-integer -b 16 $line -t wav $wav
+      # Skip any file shorter than 1000 samples.
+      nsamples=`soxi -s "$wav"`
+      if [[ "$nsamples" -gt 1000 ]]; then 
+	echo $wav >> $olist.$i
+	echo $bname $wav >> $wavscp.$i
+      fi
+    done < $flist.$i
+  ) &
+done
+wait
+cat $olist.* | sort > $olist
+cat $wavscp.* | sort > $wavscp
+rm -f $flist.* $olist.* $wavscp.*
 
 if [ -z "$scrip_timing_in_samples" ]; then
   # Transcription timings are in microseconds.
@@ -56,6 +62,8 @@ else
   # From settings_uzb and settings_uyg.
   sfs=""
 fi
+
+export LC_ALL=en_US.UTF-8
 
 echo "local/generate_data.py $MCTranscriptdir $dst/segments $dst/vocab $dst/text --utt_prefix $lang_prefix $sfs"
 local/generate_data.py $MCTranscriptdir $dst/segments $dst/vocab $dst/text --utt_prefix $lang_prefix $sfs
