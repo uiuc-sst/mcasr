@@ -79,7 +79,7 @@ function filter_recordings {
     awk '{print $2}' < $data/segments | sort | uniq > $tmpdir/recordings
     n1=`cat $tmpdir/recordings | wc -l`
     [ ! -s $tmpdir/recordings ] && \
-      echo "Empty list of recordings (bad file $data/segments)?" && exit 1;
+      echo "$0: empty list of recordings (bad file $data/segments)?" && exit 1;
     utils/filter_scp.pl $data/wav.scp $tmpdir/recordings > $tmpdir/recordings.tmp
     mv $tmpdir/recordings.tmp $tmpdir/recordings
 
@@ -122,18 +122,18 @@ function filter_utts {
   cat $data/utt2spk | awk '{print $1}' > $tmpdir/utts
 
   ! cat $data/utt2spk | sort | cmp - $data/utt2spk && \
-    echo "utt2spk is not in sorted order (fix this yourself)" && exit 1;
+    echo "$0: utt2spk is not in sorted order (fix this yourself)" && exit 1;
 
   ! cat $data/utt2spk | sort -k2 | cmp - $data/utt2spk && \
-    echo "utt2spk is not in sorted order when sorted first on speaker-id " && \
+    echo "$0: utt2spk is not in sorted order when sorted first on speaker-id " && \
     echo "(fix this by making speaker-ids prefixes of utt-ids)" && exit 1;
 
   ! cat $data/spk2utt | sort | cmp - $data/spk2utt && \
-    echo "spk2utt is not in sorted order (fix this yourself)" && exit 1;
+    echo "$0: spk2utt is not in sorted order (fix this yourself)" && exit 1;
 
   if [ -f $data/utt2uniq ]; then
     ! cat $data/utt2uniq | sort | cmp - $data/utt2uniq && \
-      echo "utt2uniq is not in sorted order (fix this yourself)" && exit 1;
+      echo "$0: utt2uniq is not in sorted order (fix this yourself)" && exit 1;
   fi
 
   maybe_wav=
@@ -144,7 +144,7 @@ function filter_utts {
       mv $tmpdir/utts.tmp $tmpdir/utts
     fi
   done
-  [ ! -s $tmpdir/utts ] && echo "fix_data_dir.sh: no utterances remained: not proceeding further." && \
+  [ ! -s $tmpdir/utts ] && echo "$0: no utterances remained: not proceeding further." && \
     rm $tmpdir/utts && exit 1;
 
 
