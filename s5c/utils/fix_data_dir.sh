@@ -51,11 +51,12 @@ done
 function filter_file {
   filter=$1
   file_to_filter=$2
+  [ ! -s $filter ] && echo "$0: warning: empty filter $filter."
   cp $file_to_filter ${file_to_filter}.tmp
   utils/filter_scp.pl $filter ${file_to_filter}.tmp > $file_to_filter
-  if ! cmp ${file_to_filter}.tmp  $file_to_filter >&/dev/null; then
-    length1=`cat ${file_to_filter}.tmp | wc -l`
-    length2=`cat ${file_to_filter} | wc -l`
+  if ! cmp ${file_to_filter}.tmp $file_to_filter >&/dev/null; then
+    length1=`wc -l < ${file_to_filter}.tmp`
+    length2=`wc -l < ${file_to_filter}`
     if [ $length1 -ne $length2 ]; then
       echo "$0: filtered $file_to_filter from $length1 to $length2 lines based on filter $filter."
     fi
@@ -72,17 +73,15 @@ function filter_recordings {
   # reco2file_and_utt, if it exists, to make sure they have the same list of
   # recording-ids.
 
-    if [ ! -f $data/wav.scp ]; then
-      echo "$0: $data/segments exists but not $data/wav.scp"
-      exit 1;
-    fi
-    awk '{print $2}' < $data/segments | sort | uniq > $tmpdir/recordings
-    n1=`cat $tmpdir/recordings | wc -l`
+    [ ! -f $data/wav.scp ] && \
+      echo "$0: $data/segments exists but not $data/wav.scp" && exit 1;
+    awk '{print $2}' < $data/segments | sort -u > $tmpdir/recordings
     [ ! -s $tmpdir/recordings ] && \
-      echo "$0: empty list of recordings (bad file $data/segments)?" && exit 1;
+      echo "$0: empty list of recordings (bad file $data/segments?)." && exit 1;
     utils/filter_scp.pl $data/wav.scp $tmpdir/recordings > $tmpdir/recordings.tmp
     mv $tmpdir/recordings.tmp $tmpdir/recordings
-
+    [ ! -s $tmpdir/recordings ] && \
+      echo "$0: empty scp-filtered list of recordings ($data/segments mismatches $data/wav.scp?)" && exit 1;
 
     cp $data/segments{,.tmp}; awk '{print $2, $1, $3, $4}' <$data/segments.tmp >$data/segments
     filter_file $tmpdir/recordings $data/segments
