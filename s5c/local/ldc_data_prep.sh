@@ -67,10 +67,12 @@ export LC_ALL=en_US.UTF-8
 
 echo "local/generate_data.py $MCTranscriptdir $dst/segments $dst/vocab $dst/text --utt_prefix $lang_prefix $sfs"
 local/generate_data.py $MCTranscriptdir $dst/segments $dst/vocab $dst/text --utt_prefix $lang_prefix $sfs
+[ -s $dst/vocab ] || { echo "local/generate_data.py made empty word list $dst/vocab. Aborting."; exit 1; }
 paste <(cut -d ' ' -f 1 $dst/text) <(cut -d '_' -f 1,2,3 $dst/text ) > $dst/utt2spk
 # Because we lack speaker information, utt2spk maps utt to utt.
 utils/utt2spk_to_spk2utt.pl $dst/utt2spk > $dst/spk2utt 
 
+# If $dst/vocab is empty, then grep gets empty input and returns nonzero, which aborts the script because of "set -e".
 tr ' ' '\n' < $dst/vocab | grep -v '<UNK>' > $dst/vocab.words
 
 # Fix any unsorted files.

@@ -11,17 +11,17 @@ def read_single_file(fname, utt_key=None, delimit='#', unk_word='', FS=44100.0):
     if utt_key == None:
         bname = path.basename(fname)
         utt_key, ext = path.splitext(bname)
-    textL = [] # list of lists
-    # Each line is a separate list of words.
-    # Whole doc is a list of lists.
+    textL = []
+    # Each line of fname is a beginTime, endTime, and list of words;
+    # so textL becomes a list of lists.
     with open(fname, 'r') as f:
         for line in f:
             line = line.strip()
             if line == '':
                 continue
             splitted = line.split(' ', 2)
-            if len(splitted ) < 3:
-                print('In file', fname, 'skipping too-short line:', line)
+            if len(splitted) < 3:
+                print(__file__, "warning: skipping too-short line '"+line+"' in file", fname)
                 continue
 
             tb, te = splitted[:2]
@@ -32,41 +32,41 @@ def read_single_file(fname, utt_key=None, delimit='#', unk_word='', FS=44100.0):
                 w = re.sub('\[.*?\]', unk_word, w.strip())
                 if w != '':
                     lineList.append(w)
-            if len(lineList) == 0 :
-                lineList = [unk_tag] # No transcrption, should we skip?
+            if not lineList:
+                lineList = [unk_tag] # No transcription, should we skip?
             try:
                 tb = float(tb)/FS
                 te = float(te)/FS
                 textL.append((tb, te, lineList))
             except ValueError:
+                print(__file__, "warning: skipping corrupt line '"+line+"' in file", fname)
                 continue
+    if not textL:
+        print(__file__, "warning: corrupt file", fname)
     return textL 
 
 if __name__ == '__main__':
     import argparse 
     parser = argparse.ArgumentParser()
     parser.add_argument('textdir', type=str, 
-                        help='directory for mismatched transcriptions. '
-                        'Each file one doc')
+                        help='Input: directory of transcriptions, one file per utterance. ')
     parser.add_argument('segments', type=str, 
-                        help='Output segments file for Kaldi setup '
-                        'utt file tb te (in sec)')
+                        help='Output: segments file for Kaldi setup, each line contains:'
+                        'utt_key file_key sec_begin sec_end')
     parser.add_argument('vocab', type=str, 
-                        help='(Nonsense) Word list, '
-                        ' will be input for G2P for lexicon generation')    
+                        help='Output: list of nonsense words, for G2P to generate lexicon')
     parser.add_argument('textout', type=str, 
-                        help='Mismatched transcriptions per utterance '
+                        help='Output: mismatched transcriptions per utterance '
                         'a.k.a Kaldi data/text, maps utterance to text')
     parser.add_argument('--unknown_word', type=str, default='<UNK>',
                         help='String to use for unknown/untranscribed segments '
                         '[noise] -> <UNK>')
     parser.add_argument('--sampling_freq', type=float, default=44100.0,
-                        help='Sampling frequency of the audio')
+                        help='Units of timing offsets (1/s)')
     parser.add_argument('--utt_prefix', type=str, default='', 
                         help='Prefix for utterance IDs, e.g. lang code')
     args = parser.parse_args()
         
-    dirname = args.textdir
     unknown_word = args.unknown_word
     utt_prefix = args.utt_prefix
     if utt_prefix!='' and utt_prefix[-1] != '_':
@@ -76,22 +76,20 @@ if __name__ == '__main__':
     textf = open(args.textout, 'w')
 
     wordSet = set()
-    for filename in glob(dirname + '/*.txt'):
-        textL = read_single_file(filename, unk_word=unknown_word, FS=args.sampling_freq)
-        bname = path.basename(filename)
-        file_key, ext = path.splitext(bname)
+    for filename in glob(args.textdir + '/*.txt'):
+        file_key, ext = path.splitext(path.basename(filename))
         file_key = utt_prefix+file_key
+        textL = read_single_file(filename, unk_word=unknown_word, FS=args.sampling_freq)
         for tb, te, words in textL:
             # sec to msec or to microsec, keep time info in the utterance name
             if args.sampling_freq == 44100.0:
                 foo = '{}_{:06d}_{:06d}'
                 scale = 1000
             else:
-                # args.sampling_freq == 1e6:  actually what's in microseconds is timing info in the transcriptions, not the audio data.
+                # args.sampling_freq == 1e6:  actually what's in microseconds is timing info in the transcriptions, *not* the audio's sample rate.
                 foo = '{}_{:09d}_{:09d}'
                 scale = 1e6
             utt_base_key = foo.format(file_key, round(tb*scale), round(te*scale))
-            # n = 0
             for n, w in enumerate(words):
                 utt_key = utt_base_key  + '_{:03d}'.format(n+1)
                 textf.write(utt_key + ' ' + w + '\n' )
@@ -101,8 +99,10 @@ if __name__ == '__main__':
 
     segf.close()
     textf.close()
+    if not wordSet:
+        print(__file__, "warning: no transcriptions in", args.textdir + '/*.txt.')
 
-    # Write words 
+    # Write the word list.
     with open(args.vocab, 'w') as f:
         for word in wordSet:
             # '\n'.join([w for w in word.split() if (w!='' and w != unknown_word) ])
