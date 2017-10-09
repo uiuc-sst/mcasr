@@ -89,7 +89,7 @@ if ($utt2spk_file ne "") {  # We have the --utt2spk option...
         ($u,$s) = @A;
         $utt2spk{$u} = $s;
     }
-    open(I, "<$inscp") || die "Opening input scp file $inscp";
+    open(I, "<$inscp") || die "Reading scp file $inscp";
     @spkrs = ();
     while(<I>) {
         @A = split;
@@ -175,10 +175,10 @@ if ($utt2spk_file ne "") {  # We have the --utt2spk option...
     # Now print out the files...
     for($scpidx = 0; $scpidx < $numscps; $scpidx++) {
         $scpfn = $OUTPUTS[$scpidx];
-        open(F, ">$scpfn") || die "Could not open scp file $scpfn for writing.";
+        open(F, ">$scpfn") || die "Failed to write to scp file $scpfn.";
         $count = 0;
         if(@{$scparray[$scpidx]} == 0) {
-            print STDERR "Error: split_scp.pl producing empty .scp file $scpfn (too many splits and too few speakers?)\n";
+            print STDERR "$0 error: producing empty .scp file $scpfn (too many splits and too few speakers?)\n";
             $error = 1;
         } else {
             foreach $spk ( @{$scparray[$scpidx]} ) {
@@ -202,24 +202,26 @@ if ($utt2spk_file ne "") {  # We have the --utt2spk option...
     }
     $numlines = @F;
     if($numlines == 0) {
-        print STDERR "split_scp.pl: error: empty input scp file $inscp , ";
+        print STDERR "$0 error: empty input scp file $inscp, ";
         $error = 1;
     }
+    # $numscps comes from steps/make_mfcc.sh $nj, from run.sh --nj.
+    # $numlines is size of $data/segments.
     $linesperscp = int( $numlines / $numscps); # the "whole part"..
-    $linesperscp >= 1 || die "You are splitting into too many pieces!";
+    $linesperscp >= 1 || die "Splitting into too many parts ($numscps > $numlines)";
     $remainder = $numlines - ($linesperscp * $numscps);
-    ($remainder >= 0 && $remainder < $numlines) || die "bad remainder $remainder";
+    ($remainder >= 0 && $remainder < $numlines) || die "Bad remainder $remainder";
     # [just doing int() rounds down].
     $n = 0;
     for($scpidx = 0; $scpidx < @OUTPUTS; $scpidx++) {
         $scpfile = $OUTPUTS[$scpidx];
-        open(O, ">$scpfile") || die "Opening output scp file $scpfile";
+        open(O, ">$scpfile") || die "Writing to scp file $scpfile";
         for($k = 0; $k < $linesperscp + ($scpidx < $remainder ? 1 : 0); $k++) {
             print O $F[$n++];
         }
         close(O) || die "Closing scp file $scpfile";
     }
-    $n == $numlines || die "split_scp.pl: code error., $n != $numlines";
+    $n == $numlines || die "Code error., $n != $numlines";
 }
 
 exit ($error ? 1 : 0);
