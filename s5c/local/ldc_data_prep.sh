@@ -2,10 +2,7 @@
 
 [ -d $data/$lang_subdir ] || { echo "Missing data/lang_subdir of audio files '$data/$lang_subdir'. Check the settings file. Aborting."; exit 1; }
 [ -d $MCTranscriptdir ] || { echo "Missing MCTranscriptdir of transcriptions '$MCTranscriptdir'. Check the settings file. Aborting."; exit 1; }
-
-find $MCTranscriptdir -type f -name \*.txt > /tmp/$$
-[ -s /tmp/$$ ] || { echo "No .txt files in $MCTranscriptdir. Aborting."; rm /tmp/$$; exit 1; }
-rm /tmp/$$
+[ $(find $MCTranscriptdir -type f -name \*.txt) ] || { echo "No .txt files in $MCTranscriptdir. Aborting."; exit 1; }
 
 dst=data/$lang
 mkdir -p $dst
@@ -13,7 +10,7 @@ flist=$dst/all.flist
 audioformat=flac
 find $data/$lang_subdir -type f -name \*.$audioformat > $flist
 if [ ! -s $flist ]; then
-  # Found no .flac files.  Try .wav instead.
+  # Found no .flac files.  Instead, find .wav's.
   audioformat=wav
   find $data/$lang_subdir -type f -name \*.$audioformat > $flist
 fi
@@ -29,7 +26,7 @@ olist=$dst/wav.list
 wavscp=$dst/wav.scp
 rm -rf $wavdir; mkdir -p $wavdir
 # Split the input file $flist, run sox in parallel,
-# then join the output fragments into $olist and $wavscp.
+# then recombine the output fragments into $olist and $wavscp.
 nparallel=`nproc | sed "s/$/-1/" | bc`	# One fewer than the number of CPU cores.
 rm -f $flist.* $olist.* $wavscp.*
 split --numeric-suffixes=1 -n r/$nparallel $flist $flist.
@@ -40,9 +37,10 @@ for i in `seq -f %02g $nparallel`; do
       bname=${bname%.$audioformat}
       wav=$wavdir/${bname}.wav
       sox -t $audioformat -r $sample_rate -e signed-integer -b 16 $line -t wav $wav
-      # Skip any file shorter than 1000 samples.
-      nsamples=`soxi -s "$wav"`
-      if [[ "$nsamples" -gt 1000 ]]; then 
+      if [[ $(( $(soxi -s $wav) )) -lt 1000 ]]; then 
+	# This file has fewer than 1000 samples.  Skip it.
+	rm $wav
+      else
 	echo $wav >> $olist.$i
 	echo $bname $wav >> $wavscp.$i
       fi
@@ -50,8 +48,8 @@ for i in `seq -f %02g $nparallel`; do
   ) &
 done
 wait
-cat $olist.* | sort > $olist
-cat $wavscp.* | sort > $wavscp
+sort $olist.* > $olist
+sort $wavscp.* > $wavscp
 rm -f $flist.* $olist.* $wavscp.*
 
 if [ -z "$scrip_timing_in_samples" ]; then
