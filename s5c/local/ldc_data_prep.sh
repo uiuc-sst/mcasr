@@ -2,7 +2,7 @@
 
 [ -d $data/$lang_subdir ] || { echo "Missing data/lang_subdir of audio files '$data/$lang_subdir'. Check the settings file. Aborting."; exit 1; }
 [ -d $MCTranscriptdir ] || { echo "Missing MCTranscriptdir of transcriptions '$MCTranscriptdir'. Check the settings file. Aborting."; exit 1; }
-[ $(find $MCTranscriptdir -type f -name \*.txt) ] || { echo "No .txt files in $MCTranscriptdir. Aborting."; exit 1; }
+[[ $(find $MCTranscriptdir -type f -name \*.txt) ]] || { echo "No .txt files in $MCTranscriptdir. Aborting."; exit 1; }
 
 dst=data/$lang
 mkdir -p $dst
@@ -52,6 +52,12 @@ sort $olist.* > $olist
 sort $wavscp.* > $wavscp
 rm -f $flist.* $olist.* $wavscp.*
 
+if [[ -z $lang_prefix ]]; then
+  utt_prefix=
+else
+  utt_prefix="--utt_prefix $lang_prefix"
+fi
+
 if [ -z "$scrip_timing_in_samples" ]; then
   # Transcription timings are in microseconds.
   sfs="--sampling_freq 1e6" # microsec to sec
@@ -63,8 +69,8 @@ fi
 
 export LC_ALL=en_US.UTF-8
 
-echo "local/generate_data.py $MCTranscriptdir $dst/segments $dst/vocab $dst/text --utt_prefix $lang_prefix $sfs"
-local/generate_data.py $MCTranscriptdir $dst/segments $dst/vocab $dst/text --utt_prefix $lang_prefix $sfs
+echo "local/generate_data.py $MCTranscriptdir $olist $dst/segments $dst/vocab $dst/text $utt_prefix $sfs"
+local/generate_data.py $MCTranscriptdir $olist $dst/segments $dst/vocab $dst/text $utt_prefix $sfs
 [ -s $dst/vocab ] || { echo "local/generate_data.py made empty word list $dst/vocab. Aborting."; exit 1; }
 paste <(cut -d ' ' -f 1 $dst/text) <(cut -d '_' -f 1,2,3 $dst/text ) > $dst/utt2spk
 # Because we lack speaker information, utt2spk maps utt to utt.

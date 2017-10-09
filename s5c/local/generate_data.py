@@ -49,10 +49,13 @@ def read_single_file(fname, utt_key=None, delimit='#', unk_word='', FS=44100.0):
     return textL 
 
 if __name__ == '__main__':
+    # https://docs.python.org/3/library/argparse.html#the-add-argument-method
     import argparse 
     parser = argparse.ArgumentParser()
     parser.add_argument('textdir', type=str, 
                         help='Input: directory of transcriptions, one file per utterance. ')
+    parser.add_argument('wavsIn', type=str, 
+                        help='Input: list of utterance .wav\'s, one per line. ')
     parser.add_argument('segments', type=str, 
                         help='Output: segments file for Kaldi setup, each line contains:'
                         'utt_key file_key sec_begin sec_end')
@@ -75,12 +78,18 @@ if __name__ == '__main__':
     if utt_prefix!='' and utt_prefix[-1] != '_':
         utt_prefix += '_'
 
+    with open(args.wavsIn) as f:
+        wavsIn = [path.basename(x.rstrip('\n')) for x in f.readlines()]
     segf = open(args.segments, 'w')
     textf = open(args.textout, 'w')
 
     wordSet = set()
     for filename in glob(args.textdir + '/*.txt'):
         file_key, ext = path.splitext(path.basename(filename))
+        # todo: for much faster lookup, instead of "in wavsIn", convert wavsIn to a set.
+        if not (file_key + ".wav") in wavsIn:
+            print(__file__, "warning: skipping transcription "+filename+" that isn't mentioned in", args.wavsIn)
+            continue
         file_key = utt_prefix+file_key
         textL = read_single_file(filename, unk_word=unknown_word, FS=args.sampling_freq)
         for tBegin, tEnd, words in textL:
