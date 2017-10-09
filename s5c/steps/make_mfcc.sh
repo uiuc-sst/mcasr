@@ -92,13 +92,13 @@ fi
 
 
 if [ -f $data/segments ]; then
-  echo "$0 [info]: segments file exists: using that."
-
+  echo "$0 [info]: using segments file."
   split_segments=""
   for n in $(seq $nj); do
-    split_segments="$split_segments $logdir/segments.$n"
+    split_segments+=" $logdir/segments.$n"
   done
 
+  echo "$0 [info]: splitting into $nj parts."
   utils/split_scp.pl $data/segments $split_segments || exit 1;
   rm $logdir/.error 2>/dev/null
 
@@ -110,18 +110,15 @@ if [ -f $data/segments ]; then
      || exit 1;
 
 else
-  echo "$0: [info]: no segments file exists: assuming wav.scp indexed by utterance."
+  echo "$0: [info]: no segments file; assuming wav.scp indexed by utterance."
   split_scps=""
   for n in $(seq $nj); do
-    split_scps="$split_scps $logdir/wav_${name}.$n.scp"
+    split_scps+=" $logdir/wav_${name}.$n.scp"
   done
 
   utils/split_scp.pl $scp $split_scps || exit 1;
 
-
-  # add ,p to the input rspecifier so that we can just skip over
-  # utterances that have bad wave data.
-
+  # Append ,p to the input rspecifier, to skip utterances with bad wave data.
   $cmd JOB=1:$nj $logdir/make_mfcc_${name}.JOB.log \
     compute-mfcc-feats  $vtln_opts --verbose=2 --config=$mfcc_config \
      scp,p:$logdir/wav_${name}.JOB.scp ark:- \| \
@@ -151,15 +148,15 @@ fi
 
 rm $logdir/wav_${name}.*.scp  $logdir/segments.* 2>/dev/null
 
-nf=`cat $data/feats.scp | wc -l`
-nu=`cat $data/utt2spk | wc -l`
+nf=`wc -l < $data/feats.scp`
+nu=`wc -l < $data/utt2spk`
 if [ $nf -ne $nu ]; then
-  echo "It seems not all of the feature files were successfully processed ($nf != $nu);"
+  echo "Some feature files failed to be processed ($nf != $nu);"
   echo "consider using utils/fix_data_dir.sh $data"
 fi
 
 if [ $nf -lt $[$nu - ($nu/20)] ]; then
-  echo "Less than 95% the features were successfully generated.  Probably a serious error."
+  echo "Less than 95% of the features were generated.  Probably a serious error."
   exit 1;
 fi
 
