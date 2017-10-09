@@ -21,10 +21,10 @@ def read_single_file(fname, utt_key=None, delimit='#', unk_word='', FS=44100.0):
                 continue
             splitted = line.split(' ', 2)
             if len(splitted) < 3:
-                print(__file__, "warning: skipping too-short line '"+line+"' in file", fname)
+                print(__file__, "warning: skipping incomplete line '"+line+"' in file", fname)
                 continue
 
-            tb, te = splitted[:2]
+            tBegin, tEnd = splitted[:2]
             words = splitted[2].split(delimit)
             lineList = []
             # Need to replace [*] with UNK?
@@ -35,9 +35,12 @@ def read_single_file(fname, utt_key=None, delimit='#', unk_word='', FS=44100.0):
             if not lineList:
                 lineList = [unk_tag] # No transcription, should we skip?
             try:
-                tb = float(tb)/FS
-                te = float(te)/FS
-                textL.append((tb, te, lineList))
+                tBegin = float(tBegin)/FS
+                tEnd = float(tEnd)/FS
+                if tBegin >= tEnd:
+                    print(__file__, "warning: skipping reversed-time line '"+line+"' in file", fname)
+                    continue
+                textL.append((tBegin, tEnd, lineList))
             except ValueError:
                 print(__file__, "warning: skipping corrupt line '"+line+"' in file", fname)
                 continue
@@ -80,7 +83,7 @@ if __name__ == '__main__':
         file_key, ext = path.splitext(path.basename(filename))
         file_key = utt_prefix+file_key
         textL = read_single_file(filename, unk_word=unknown_word, FS=args.sampling_freq)
-        for tb, te, words in textL:
+        for tBegin, tEnd, words in textL:
             # sec to msec or to microsec, keep time info in the utterance name
             if args.sampling_freq == 44100.0:
                 foo = '{}_{:06d}_{:06d}'
@@ -89,13 +92,13 @@ if __name__ == '__main__':
                 # args.sampling_freq == 1e6:  actually what's in microseconds is timing info in the transcriptions, *not* the audio's sample rate.
                 foo = '{}_{:09d}_{:09d}'
                 scale = 1e6
-            utt_base_key = foo.format(file_key, round(tb*scale), round(te*scale))
+            utt_base_key = foo.format(file_key, round(tBegin*scale), round(tEnd*scale))
             for n, w in enumerate(words):
                 utt_key = utt_base_key  + '_{:03d}'.format(n+1)
                 textf.write(utt_key + ' ' + w + '\n' )
                 if w != unknown_word:
                     wordSet.update([x for x in w.split(' ') if x.find(unknown_word)==-1])
-                segf.write('{} {} {:.6f} {:.6f}\n'.format(utt_key, file_key, tb, te))
+                segf.write('{} {} {:.6f} {:.6f}\n'.format(utt_key, file_key, tBegin, tEnd))
 
     segf.close()
     textf.close()
