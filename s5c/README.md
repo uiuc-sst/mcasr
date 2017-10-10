@@ -20,7 +20,7 @@ Each transcription file has a set of lines.  Each line has a begin time in μs, 
 `52379999 53627141 baburaad # gaboora ad # gaburaarz`.  Lines are sorted by begin time.  
 The transcription files are in a single directory, which the next step will call `$MCTranscriptdir`.  
 If the transcriptions were crowdsourced, these transcription files (one per second-long audio clip) can be built by a script `restitch-clips-SomeLanguage.rb` in [`0-mturk`](../0-mturk).  
-If the transcriptions came from a native speaker, each transcription file (one per original audio file) is then just a single line: begin time, end time, and the transcription itself.
+If the transcriptions came from a native speaker, each transcription file (one per original audio file) is then just a single line: begin time, end time, and the transcription itself.  These files can be built by, e.g., [`0-mturk/prepare-NI.rb`](../0-mturk/prepare-NI.rb).  
 
 ### Define variables in the settings file.
 
