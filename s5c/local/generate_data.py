@@ -84,7 +84,7 @@ if __name__ == '__main__':
     textf = open(args.textout, 'w')
 
     wordSet = set()
-    for filename in glob(args.textdir + '/*.txt'):
+    for filename in sorted(glob(args.textdir + '/*.txt')):
         file_key, ext = path.splitext(path.basename(filename))
         # todo: for much faster lookup, instead of "in wavsIn", convert wavsIn to a set.
         if not (file_key + ".wav") in wavsIn:
