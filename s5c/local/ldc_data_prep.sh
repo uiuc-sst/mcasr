@@ -69,6 +69,9 @@ fi
 
 export LC_ALL=en_US.UTF-8
 
+# These files will be rebuilt immediately.  Don't let debris from previous botched runs corrupt this run.
+rm -f $dst/cmvn.scp $dst/utt2spk $dst/segments $dst/vocab $dst/segments $dst/vocab.words
+
 echo "local/generate_data.py $MCTranscriptdir $olist $dst/segments $dst/vocab $dst/text $utt_prefix $sfs"
 local/generate_data.py $MCTranscriptdir $olist $dst/segments $dst/vocab $dst/text $utt_prefix $sfs
 [ -s $dst/vocab ] || { echo "local/generate_data.py made empty word list $dst/vocab. Aborting."; exit 1; }
@@ -76,7 +79,6 @@ paste <(cut -d ' ' -f 1 $dst/text) <(cut -d '_' -f 1,2,3 $dst/text ) > $dst/utt2
 # Because we lack speaker information, utt2spk maps utt to utt.
 utils/utt2spk_to_spk2utt.pl $dst/utt2spk > $dst/spk2utt 
 
-# If $dst/vocab is empty, then grep gets empty input and returns nonzero, which aborts the script because of "set -e".
 tr ' ' '\n' < $dst/vocab | grep -v '<UNK>' > $dst/vocab.words
 
 # Fix any unsorted files.
