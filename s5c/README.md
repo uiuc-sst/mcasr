@@ -1,11 +1,16 @@
 ## Leda Sari's scripts.
 
-### Get a G2P model.
+### Get G2P models.
 Into the directory `./inputs`, put:  
 - the file `phoneset.txt`  
 - the subdirectory `g2p_reduced`
-(with files dict.plain, dict.clean, final.phoneset, final.oldID2newID, lexicon_autogen.1, vocab.plain, vocab.all)  
-- the subdirectory `g2p_reduced_model` (with files model-1, model-2, model-3).
+(with files dict.plain, dict.clean, final.phoneset, final.oldID2newID, lexicon_autogen.1, vocab.plain, vocab.all;
+vocab.* came from an English dictionary)  
+- the subdirectory `g2p_reduced_model` (trained G2P models, as files model-1, model-2, model-3).
+
+These files come from Leda Sari's scripts, which train several G2P models from
+a pronunciation dictionary and a manually extended English dictionary.
+These need to be rerun only when the dictionary or `phoneset.txt` is changed.
 
 ### Get recordings of speech.
 These have the same attributes such as format (.flac or .wav) and sampling rate.
