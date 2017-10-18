@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+
 # Extract nonsense words from a too-big pronunciation dictionary, whose lines have the form
 #     a'laahamaschi a l a ah a m a sc h i
 #     a'laahamaschi a l aa h a m a s c h i
@@ -23,5 +23,5 @@
 # Puts each word on its own line.
 # Removes fresh duplicates.
 
-awk '{print $1}' | sort -u | \
+cut -f 1 -d ' ' | sort -u | \
     grep -v "^[0-9]" | sed "s/[^a-z']/ /g" | sed "s/\s+/ /g" | sed "s/ /\n/g" | sort -u
