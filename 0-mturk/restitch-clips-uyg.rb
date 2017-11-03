@@ -47,13 +47,13 @@ $clips = clips.sort_by {|wav,*| wav}
 
 transcriptions = Array.new(46749) { [] }; # An empty array for each clip.
 
+# Convert source files from DOS format, and append a newline just in case.
+`awk '{print $0}' /r/lorelei/PTgen/test/2016-11-28/batchfiles-raw/Batch* | tr -d '\015' > /tmp/batchfile`
 # Parse the original batchfile into a table of [iClip, "transcription"].
 # Each line: the "99999.mp3"'s, then the last 8 column-delimited "strings".
 # Indices are documented in preprocess_turker_transcripts.pl.
 require 'csv'
-# cd /r/lorelei/PTgen/test/2016-11-28; cat batchfiles-raw/Batch* > data/batchfiles/UY/batchfile
-raw = CSV.read('/r/lorelei/PTgen/test/2016-11-28/data/batchfiles/UY/batchfile')
-raw.each {|r|
+CSV.foreach('/tmp/batchfile') {|r|
   mp3s = r[27..41].select {|c| c =~ /mp3/} .map {|l| l.match(/[0-9]+/)[0].to_i } # Only mp3's; then keep only the number.
   scrips = r[45..52]
   next if mp3s.size != 8 || scrips.size != 8 # This is a header line.  Ignore it.

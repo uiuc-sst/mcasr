@@ -27,14 +27,14 @@ timings.each {|utt,samples| $timings[utt] = samples}
 # For each wavfile i.e. clip, hash to an array of transcriptions.
 transcriptions = Hash.new {|k,v| k[v] = []}
 
+# Convert source files from DOS format, and append a newline just in case.
+`awk '{print $0}' /r/lorelei/PTgen/test/2016-08-24/batchfiles-raw/Batch_*_batch_results.csv | tr -d '\015' > /tmp/batchfile`
 # Parse the original batchfile into a table of [clip, "transcription"].
 # Each line: the "Uzbpart-21/UZB_333_001.wav"'s, then the last 8 column-delimited "strings".
 # Indices are documented in preprocess_turker_transcripts.pl.
 require 'csv'
-`cat /r/lorelei/PTgen/test/2016-08-24/batchfiles-raw/Batch_*_batch_results.csv > /tmp/batchfile`
 # batch_results.csv lacks any Uzbpart-59 and Uzbpart-60.
-raw = CSV.read('/tmp/batchfile')
-raw.each {|r|
+CSV.foreach('/tmp/batchfile') {|r|
   # Only wav's.  Then keep only the unique part.  Then map "31/UZB_374_002" to "374_002_31".
   wavs = r[27..42].select {|c| c =~ /wav/} \
     .map {|l| l.sub("http://www.isle.illinois.edu/uzbek/splitUZB/Uzbpart-", "") .sub(".wav", "") } \
