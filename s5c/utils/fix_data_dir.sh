@@ -27,7 +27,6 @@ trap 'rm -rf "$tmpdir"' EXIT HUP INT PIPE TERM
 
 export LC_ALL=C
 
-
 function check_sorted {
   file=$1
   sort -k1,1 -u <$file >$file.tmp
@@ -46,7 +45,6 @@ for x in utt2spk spk2utt feats.scp text segments wav.scp cmvn.scp vad.scp \
     check_sorted $data/$x
   fi
 done
-
 
 function filter_file {
   filter=$1
@@ -125,7 +123,7 @@ function filter_utts {
 
   ! cat $data/utt2spk | sort -k2 | cmp - $data/utt2spk && \
     echo "$0: utt2spk is not in sorted order when sorted first on speaker-id " && \
-    echo "(fix this by making speaker-ids prefixes of utt-ids)" && exit 1;
+    echo "(fix this yourself by making speaker-ids prefixes of utt-ids, and avoiding numbers with nonconstant number of digits)" && exit 1;
 
   ! cat $data/spk2utt | sort | cmp - $data/spk2utt && \
     echo "$0: spk2utt is not in sorted order (fix this yourself)" && exit 1;
@@ -146,7 +144,6 @@ function filter_utts {
   [ ! -s $tmpdir/utts ] && echo "$0: no utterances remained: not proceeding further." && \
     rm $tmpdir/utts && exit 1;
 
-
   if [ -f $data/utt2spk ]; then
     new_nutts=$(cat $tmpdir/utts | wc -l)
     old_nutts=$(cat $data/utt2spk | wc -l)
@@ -165,7 +162,6 @@ function filter_utts {
       fi
     fi
   done
-
 }
 
 filter_recordings
