@@ -35,7 +35,7 @@ Examples of a settings file are `settings_xxx`, e.g. [`settings_uzb`](./settings
 **`lang`**: The language being transcribed, and the name of the subdirectories
 of the input dir `./data` and the output dirs `./exp` and `./$mfccdir`.  
 
-**`lang_subdir`**: Subtree of `$data` containing speech recordings.  
+**`lang_subdir`**: Subtree of `$data` containing speech recordings.  To use all of `$data`, just make this `.`.  
 **`sample_rate`**: Sample rate of these recordings, in Hz.  
 
 **`MCTranscriptdir`**: Subdirectory containing text transcriptions such as `449_004.txt`.     
