@@ -1,0 +1,8 @@
+data=/home/camilleg/l/aug
+lang=Oromo
+MCTranscriptdir=scrips-orm
+lang_subdir=Oromo/IL6_SetE_SpeechData_20170601/IL6_SetE_SpeechData
+lang_prefix=IL6_EVAL
+sample_rate=44100
+pron_var=5
+stage=0

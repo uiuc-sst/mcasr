@@ -1,0 +1,8 @@
+data=/home/camilleg/l/aug
+lang=Tigrinya
+MCTranscriptdir=scrips-tir
+lang_subdir=Tigrinya/IL5_SetE_SpeechData_20170601/IL5_SetE_SpeechData
+lang_prefix=IL5_EVAL
+sample_rate=44100
+pron_var=5
+stage=0
