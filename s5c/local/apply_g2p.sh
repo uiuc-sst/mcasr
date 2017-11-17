@@ -22,22 +22,29 @@ g2p_model_dir=$2
 phoneset=$3
 dd=$4 # Data dir.
 
-mkdir -p $dd
-# $gen creates $dd/lexicon_autogen.1, which we then modify.
-alias gen="local/generate_vocab.sh --pron_variants $pron_variants $g2p_model_dir $phoneset $dd"
-alias findfailed="grep failed | cut -d ':' -f 1 | cut -d ' ' -f 4 | sed 's/\"//g'"
+makelex () {
+  # Its single arg is the model order, 1 or 2.
+  # Create $dd/lexicon_autogen.1, which we then modify.
+  local/generate_vocab.sh --model_order $1 --pron_variants $pron_variants $g2p_model_dir $phoneset $dd
+}
+findfailed() {
+  grep failed | cut -d ':' -f 1 | cut -d ' ' -f 4 | sed 's/\"//g'
+}
+
+set -e
 export LC_ALL=en_US.UTF-8
+mkdir -p $dd
 
 # Apply G2P, using an already-trained bigram G2P model.
-$gen --model_order 2 < $MCdict &> $dd/log.2
+makelex 2 < $MCdict &> $dd/log.2
 cat $dd/lexicon_autogen.1
 [ $(grep -c failed $dd/log.2) -le 0 ] && exit 0
 # There were failure cases, so retry those with a unigram G2P model.
 
-findfailed < $dd/log.2 | $gen --model_order 1 &> $dd/log.1
+findfailed < $dd/log.2 | makelex 1 &> $dd/log.1
 cat $dd/lexicon_autogen.1
 [ $(grep -c failed $dd/log.1) -le 0 ] && exit 0
 # There were still failure cases, so retry those with accents removed.
 
-findfailed < $dd/log.1 | local/remove_accents.py $dd/word.map | $gen --model_order 1 &> $dd/log.0
+findfailed < $dd/log.1 | local/remove_accents.py $dd/word.map | makelex 1 &> $dd/log.0
 local/convert_words.py $dd/word.map < $dd/lexicon_autogen.1
