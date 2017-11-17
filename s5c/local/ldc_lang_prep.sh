@@ -28,16 +28,15 @@ awk -F'\t' '{if ($1!="" && $4!="") print $1"("$2")",$3,$4}' $lex | sed 's/(0)//g
 # Remove probabilities.
 awk '{$2=""; print}' $odir/lexiconp.intt > $odir/lexicon.intt
 
+awk '{print $2}'    $phoneset > $odir/nonsilence_phones.txt
 awk '{print $2,$1}' $phoneset > $odir/phonemap.txt
 utils/int2sym.pl -f 3- $odir/phonemap.txt $odir/lexiconp.intt | sed 's/ 0.000000 / 0.000001 /' > $odir/lexiconp.txt
 # The sed filter rounds up 0.0's to prevent utils/validate_dict_dir.pl from complaining about 0.0's.
 # It's only needed for field 2, but the general tool utils/int2sym.pl shouldn't be customized to do that.
 
 cd $odir
-
 echo 'SIL SPN NSN' > extra_questions.txt 
-echo -e "SIL\nSPN\nNSN\n" > silence_phones.txt
-awk '{print $2}' $phoneset > nonsilence_phones.txt
+echo -e "SIL\nSPN\nNSN" > silence_phones.txt
 echo 'SIL' > optional_silence.txt
 
 cat <<EOT >> lexiconp.txt
