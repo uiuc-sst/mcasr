@@ -65,4 +65,4 @@ This generates the files `exp/$lang/*/ali.*.gz`, `fsts.*.gz`, `trans.*`, log fil
 
 ### Clean up.
 
-To remove the generated files, or for a *completely* fresh run when setting `stage=0` in the settings file, remove the directories `exp/$lang` and `data/$lang`.
+To remove the generated files, or for a *completely* fresh run when setting `stage=0` in the settings file, remove the directories `exp/$lang` and `data/$lang` (but keep `data/$lang/g2p/phoneset.txt`).

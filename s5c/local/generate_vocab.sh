@@ -1,59 +1,47 @@
 #!/bin/bash
 
+# On stdin read a nonsense-English pronlex (aka MCdict),
+# e.g. /ws/ifp-53_1/hasegawa/lsari2/data/mcasr/fromWenda/dict_grapheme.txt.
+# Keep its words; discard its pronunciations.
+# Via g2p.sh, create lexicon_autogen.1, for our caller apply_g2p.sh to modify.
+
 export LC_ALL=C
 
-# Default values, so parse_options.sh doesn't die.
-MCdict='/ws/ifp-53_1/hasegawa/lsari2/data/mcasr/fromWenda/dict_grapheme.txt'
-g2pdatadir=data/Uyghur/local/g2p
-model_order=3
+# Default values for parse_options.sh.
+dd=data/Uyghur/local/g2p
+model_order=2
 pron_variants=5
 
 . ./path.sh || exit 1
 . utils/parse_options.sh || exit 1
 
-if [ "$#" -lt 4 ]; then
-  echo "Usage: $0 MC_vocab/dict G2P_model phone_set G2P_data_dir"
-  echo "e.g.: $0 /ws/ifp-53_1/hasegawa/lsari2/data/mcasr/fromWenda/dict_grapheme.txt data/Uyghur/local/g2p"
+if [ "$#" -ne 4 ]; then
+  >&2 echo "Usage: $0 G2P_model_dir phone_set G2P_data_dir < MC_vocab/dict > logfile"
   exit 1
 fi
-# if [ "$#" -eq 5 ]; then
-#     model_order=$5
-# fi
  
-MCdict=$1
-g2pmodeldir=$2
-phoneset=$3
-g2pdatadir=$4
+g2pmodeldir=$1
+phoneset=$2
+dd=$3 # Data dir.
 
-[ -f $MCdict ] || { echo "$0: missing nonsense-words file $MCdict"; exit 1; }
-[ -d $g2pmodeldir ] || { echo "$0: missing G2P model directory $g2pmodeldir"; exit 1; }
+[ ! -d $g2pmodeldir ] && >&2 echo "$0: missing G2P model directory $g2pmodeldir." && exit 1
 
-mkdir -p $g2pdatadir
+>&2 echo "$0: model order and number of pronunciation variants for G2P application are: $model_order $pron_variants"
 
-echo "Model order and number of pronunciation variants for G2P application: $model_order $pron_variants"
-
+# Copy the g2p model and the phone set to the data dir.
+mkdir -p $dd
 g2pmodel=$g2pmodeldir/model-$model_order
-for f in $g2pmodel $phoneset; do
-    [ -f $f ] || { echo "$0: missing file $f"; exit 1; }
-    # Copy G2P model and the phone set.
-    cp $f ${g2pdatadir}
-done
+[ ! -f $g2pmodel ] && >&2 echo "$0: missing G2P model file $g2pmodel." && exit 1
+[ ! -f $phoneset ] && >&2 echo "$0: missing phone set file $phoneset." && exit 1
+cp $g2pmodel $phoneset $dd
 
-if [ -f $g2pdatadir/vocab.plain ]; then
-    # If we run several G2P steps sequentially, overwrite vocab.plain backup.
-    echo "Saving $g2pdatadir/vocab.plain as vocab.plain.0."
-    mv $g2pdatadir/vocab.plain $g2pdatadir/vocab.plain.0
-fi
+# Back up any vocab.plain from a previous run of this script (called by local/apply_g2p.sh).
+[ -f $dd/vocab.plain ] && mv $dd/vocab.plain $dd/vocab.plain.0
 
-# first column contains the words
-awk '{print $1 }' $MCdict | sort | uniq > $g2pdatadir/vocab.all
-# Rm words starting with numbers, rm punctuation marks
-egrep -v '^[^a-z]' $g2pdatadir/vocab.all | tr -d '[:punct:]' \
-    | uniq >  $g2pdatadir/vocab.plain
+# Get words from the first column.
+# Keep only words that start with letters.
+# Strip punctuation.
+cut -d ' ' -f1 | egrep -v '^[^a-z]' | tr -d '[:punct:]' | sort -u > $dd/vocab.plain
 
-# Assuming that G2P is already trained
-# cp phoneset and G2P model
-
-ls $g2pmodel
-echo "./local/g2p.sh $g2pdatadir/vocab.plain ${g2pdatadir} $g2pdatadir/lexicon_autogen.1 $model_order $pron_variants 2>&1 ${g2pdatadir}/log.$model_order"
-./local/g2p.sh $g2pdatadir/vocab.plain ${g2pdatadir} $g2pdatadir/lexicon_autogen.1 $model_order $pron_variants 2>&1 ${g2pdatadir}/log.$model_order
+# The G2P must be already trained.
+local/g2p.sh $dd/vocab.plain $dd $dd/lexicon_autogen.1 $model_order $pron_variants 2>&1 $dd/log.$model_order

@@ -86,5 +86,5 @@ export LC_ALL=C
 utils/data/fix_data_dir.sh $dst
 
 mkdir -p $dst/g2p 
-cp $dst/vocab.words $dst/g2p
+cp $dst/vocab.words $dst/g2p   # Why cp instead of mv?
 # cp phoneset $dst/g2p

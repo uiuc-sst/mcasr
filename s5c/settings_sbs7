@@ -6,8 +6,8 @@ sample_rate=16000
 pron_var=5
 stage=0
 
-# $data is copied from rizzo.ifp.uiuc.edu:/ws/rz-cl-2/hasegawa/amitdas/corpus/ws15-pt-data/data/audio/.
+# $data came from rizzo.ifp.uiuc.edu:/ws/rz-cl-2/hasegawa/amitdas/corpus/ws15-pt-data/data/audio/.
 
-# After running this:
+# After run.sh, do this:
 # /ws/ifp-53_1/hasegawa/tools/kaldi/kaldi/src/bin/ali-to-phones exp/sbs7/tri4b/final.mdl ark:'zcat exp/sbs7/tri4b_ali/ali.*.gz|' ark,t:- | utils/int2sym.pl -f 2- data/sbs7/lang/phones.txt - > ~/l/PTgen/mcasr/sbs7-clips.txt
 # cd ~/l/PTgen/mcasr; ./stage1.rb < sbs7-clips.txt > stage1-sbs7.txt

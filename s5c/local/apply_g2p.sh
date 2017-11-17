@@ -1,13 +1,13 @@
 #!/bin/bash
 
-# Apply G2P with a second-order model.
-# Retry any failed words with a first-order model.
+# Apply G2P with a second-order (bigram) model.
+# Retry any failed words with a first-order (unigram) model.
 # Retry any still-failed words by removing their accents.
 # In all three cases, call generate_vocab.sh.
-# The final lexicon is the cases' concatenation, $g2pdatadir/lexicon_autogen.1.
+# On stdout write the generated lexicon, as the cases' concatenation
+# (run.sh writes this script's STDOUT into $dd/lexicon_autogen.1).
 
 # Default values for parse_options.sh.
-model_order=2
 pron_variants=5
 g2p_model_dir=inputs/g2p_reduced_model
 phoneset=inputs/phoneset.txt # Includes OOV symbol.
@@ -15,56 +15,29 @@ phoneset=inputs/phoneset.txt # Includes OOV symbol.
 . ./path.sh || exit 1
 . utils/parse_options.sh || exit 1
 
-[ "$#" -ge 4 ] || { echo "Usage: $0 mc-vocab/dict G2P-model phone-set g2p-data-dir"; exit 1; }
-# if [ "$#" -eq 5 ]; then
-#     model_order=$5
-# fi
+[ "$#" -lt 4 ] && >&2 echo "Usage: $0 mc-vocab/dict G2P-model phone-set g2p-data-dir" && exit 1
  
 MCdict=$1
 g2p_model_dir=$2
 phoneset=$3
-g2pdatadir=$4
+dd=$4 # Data dir.
 
-mkdir -p $g2pdatadir
-
+mkdir -p $dd
+# $gen creates $dd/lexicon_autogen.1, which we then modify.
+alias gen="local/generate_vocab.sh --pron_variants $pron_variants $g2p_model_dir $phoneset $dd"
+alias findfailed="grep failed | cut -d ':' -f 1 | cut -d ' ' -f 4 | sed 's/\"//g'"
 export LC_ALL=en_US.UTF-8
 
-# Apply G2P, assuming that we have already trained a G2P model.
-local/generate_vocab.sh --model_order 2 --pron_variants $pron_variants $MCdict $g2p_model_dir $phoneset $g2pdatadir &> $g2pdatadir/log.2
-echo "Generate vocab using a bigram model: Done"
-mv $g2pdatadir/lexicon_autogen.1 $g2pdatadir/lexicon_autogen.bi
+# Apply G2P, using an already-trained bigram G2P model.
+$gen --model_order 2 < $MCdict &> $dd/log.2
+cat $dd/lexicon_autogen.1
+[ $(grep -c failed $dd/log.2) -le 0 ] && exit 0
+# There were failure cases, so retry those with a unigram G2P model.
 
-# If there are failure cases, back off to a unigram G2P model.
-if [ $(grep -c failed $g2pdatadir/log.2) -gt 0 ]; then
-    # mv $g2pdatadir/lexicon_autogen.1  $g2pdatadir/lexicon_autogen.bi
-    MCdictfail=$g2pdatadir/vocab.fail.1
-    grep failed $g2pdatadir/log.2 | cut -d ':' -f 1 | cut -d ' ' -f 4 |sed 's/\"//g' > $MCdictfail
-    local/generate_vocab.sh --model_order 1 --pron_variants $pron_variants $MCdictfail $g2p_model_dir $phoneset $g2pdatadir &> $g2pdatadir/log.1
-    mv $g2pdatadir/lexicon_autogen.1 $g2pdatadir/lexicon_autogen.uni
-else
-    # Done, no need for further processing
-    mv $g2pdatadir/lexicon_autogen.bi  $g2pdatadir/lexicon_autogen.1
-    exit 0
-fi
+findfailed < $dd/log.2 | $gen --model_order 1 &> $dd/log.1
+cat $dd/lexicon_autogen.1
+[ $(grep -c failed $dd/log.1) -le 0 ] && exit 0
+# There were still failure cases, so retry those with accents removed.
 
-# If there are still failure cases, remove accent symbols and retry.
-if [ $(grep -c failed $g2pdatadir/log.1) -gt 0 ]; then
-    # mv $g2pdatadir/lexicon_autogen.1  $g2pdatadir/lexicon_autogen.uni
-    MCdictfail=$g2pdatadir/vocab.fail.2
-    grep failed $g2pdatadir/log.1 | cut -d ':' -f 1 | \
-	cut -d ' ' -f 4 | sed 's/\"//g' > $g2pdatadir/tmp
-    local/remove_accents.py $g2pdatadir/tmp $MCdictfail $g2pdatadir/word.map
-    
-    local/generate_vocab.sh --model_order 1 --pron_variants $pron_variants $MCdictfail $g2p_model_dir $phoneset $g2pdatadir &> $g2pdatadir/log.0
-
-    local/convert_words.py $g2pdatadir/word.map $g2pdatadir/lexicon_autogen.1 $g2pdatadir/lexicon_autogen.0
-else
-    # Done, no need for accent removal
-    cat $g2pdatadir/lexicon_autogen.uni $g2pdatadir/lexicon_autogen.bi | sort > $g2pdatadir/lexicon_autogen.1
-    exit 0
-fi
-
-# ls $g2pdatadir/lexicon_autogen.*
-
-cat $g2pdatadir/lexicon_autogen.uni $g2pdatadir/lexicon_autogen.bi \
-    $g2pdatadir/lexicon_autogen.0 | sort > $g2pdatadir/lexicon_autogen.1
+findfailed < $dd/log.1 | local/remove_accents.py $dd/word.map | $gen --model_order 1 &> $dd/log.0
+local/convert_words.py $dd/word.map < $dd/lexicon_autogen.1

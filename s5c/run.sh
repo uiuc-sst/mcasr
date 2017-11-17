@@ -9,13 +9,13 @@
 # Refactored by Camille Goudeseune.
 ####################################################################
 
-[ $# -eq 1 ] || { echo "Usage: $0 settings_file"; exit 1; }
-[ -f $1 ] || { echo "$0: missing settings file '$1'." && exit 1; }
+[ $# -ne 1 ] && echo "Usage: $0 settings_file" && exit 1
+[ ! -f $1 ]  && echo "$0: missing settings file '$1'." && exit 1
 
 . ./cmd.sh
 . ./path.sh
 . $1 # Read settings: $data, $lang, $MCTranscriptdir, $lang_subdir, $lang_prefix, $sample_rate, $pron_var, $stage.
-[ -d $data ] || { echo "$0: missing MC data directory $data."; exit 1; }
+[ ! -d $data ] && echo "$0: missing MC data directory $data." && exit 1
 
 set -e
 
@@ -26,25 +26,24 @@ export LC_ALL=C
 
 if [ $stage -lt 1 ] ; then
 
-# ( . foo.sh ) lets foo.sh see run.sh's $variables without letting it change them.
+# ( . foo.sh ) shows foo.sh the $variables of run.sh, without letting it change them.
 ( . local/ldc_data_prep.sh )
 echo "Data prep: Done"
 
-[ -d inputs ] || { echo "$0: missing inputs directory 'inputs'"; exit 1; }
+[ ! -d inputs ] && echo "$0: missing inputs directory 'inputs'" && exit 1
 phoneset=inputs/phoneset.txt # Includes OOV symbol
 g2p_model_dir=inputs/g2p_reduced_model
 g2pdatadir=data/$lang/g2p
 MCdict=$g2pdatadir/vocab.words 
 
 # Apply the trained G2P model in $g2p_model_dir, via local/generate_vocab.sh.
-local/apply_g2p.sh --model_order 2 --pron_variants $pron_var $MCdict $g2p_model_dir $phoneset $g2pdatadir
+local/apply_g2p.sh --pron_variants $pron_var $MCdict $g2p_model_dir $phoneset $g2pdatadir | sort > $g2pdatadir/lexicon_autogen.1
 echo "Generate vocab: Done"
 
 local/ldc_lang_prep.sh $g2pdatadir data/$lang/local/dict
 echo "lang prep: Done"
 
-utils/prepare_lang.sh data/$lang/local/dict \
-  "<UNK>" data/$lang/local/lang_tmp data/$lang/lang
+utils/prepare_lang.sh data/$lang/local/dict "<UNK>" data/$lang/local/lang_tmp data/$lang/lang
 echo "prepare_lang: Done"
 fi
 
@@ -53,6 +52,7 @@ nparallel=`nproc | sed "s/$/-1/" | bc`  # One fewer than the number of CPU cores
 nLines=$(wc -l < data/$lang/segments)
 [ $nparallel -le $nLines ] || nparallel=$nLines
 # todo: like nLines, do the same for the number of speakers (45).
+# todo: like nLines, do the same for the number of uttid's.
 
 # ++++++++++++ MFCC +++
 mfccdir=mfcc
