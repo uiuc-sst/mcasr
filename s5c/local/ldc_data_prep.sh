@@ -4,6 +4,9 @@
 [ -d $MCTranscriptdir ] || { echo "Missing MCTranscriptdir of transcriptions '$MCTranscriptdir'. Check the settings file. Aborting."; exit 1; }
 [[ $(find $MCTranscriptdir -type f -name \*.txt) ]] || { echo "No .txt files in $MCTranscriptdir. Aborting."; exit 1; }
 
+# todo: if [ -f $dst/feats.scp ] rm $dst/feats.scp, and also $flist.*, so they are properly recreated
+# if, say, the number of transcriptions per clip increased since the last run.
+
 dst=data/$lang
 mkdir -p $dst
 flist=$dst/all.flist
